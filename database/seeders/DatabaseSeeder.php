@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // Truncate tables
+        DB::table('vehicles')->truncate();
+        DB::table('drivers')->truncate();
         DB::table('students')->truncate();
         DB::table('schools')->truncate();
 
@@ -26,6 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SchoolSeeder::class,
             StudentSeeder::class,
+            DriverSeeder::class,
+            VehicleSeeder::class,
         ]);
     }
 }

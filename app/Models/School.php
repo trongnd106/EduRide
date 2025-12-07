@@ -41,4 +41,20 @@ class School extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    /**
+     * Get the drivers for the school.
+     */
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class);
+    }
+
+    /**
+     * Get the vehicles for the school.
+     */
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class);
+    }
 }
