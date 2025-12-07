@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * App\Models\Student
- * @mixin \Eloquent
- */
-class Student extends Authenticatable
+class School extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,15 +16,12 @@ class Student extends Authenticatable
      * @var array<string>
      */
     protected $fillable = [
-        'school_id',
-        'student_number',
-        'email',
-        'full_name',
+        'name',
+        'code',
         'phone',
-        'gender',
-        'dob',
-        'grade',
+        'information',
         'address',
+        'status',
     ];
 
     /**
@@ -37,20 +30,16 @@ class Student extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'gender' => 'boolean',
-        'dob' => 'date',
-        'grade' => 'integer',
         'status' => 'integer',
-        'school_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the school that the student belongs to.
+     * Get the students for the school.
      */
-    public function school()
+    public function students()
     {
-        return $this->belongsTo(School::class);
+        return $this->hasMany(Student::class);
     }
 }
