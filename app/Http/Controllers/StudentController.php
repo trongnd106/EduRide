@@ -60,8 +60,8 @@ class StudentController extends Controller
      */
     public function show($id)
     {
-        $user = $this->service->show($id);
-        return $this->respond($user);
+        $student = $this->service->show($id);
+        return $this->respond($student);
     }
 
     /**
@@ -190,7 +190,7 @@ class StudentController extends Controller
         return $this->respond($result);
     }
 
-    
+
     /**
      * @OA\Post(
      *     path="students",

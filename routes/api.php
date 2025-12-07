@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SchoolController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 
@@ -18,10 +19,12 @@ Route::get('/', function () {
     return response()->json(['status' => 'OK', 'message' => 'API is working!']);
 });
 
-Route::group(['prefix' => 'students', 'as' => 'student'], function () {
-    Route::get('/{id}', [StudentController::class, 'show'])->name('show');
-    Route::get('/', [StudentController::class, 'index'])->name('index');
-    Route::post('/', [StudentController::class, 'store'])->name('store');
-    Route::put('/{id}', [StudentController::class, 'update'])->name('update');
-    Route::delete('/{id}', [StudentController::class, 'destroy'])->name('destroy');
-});
+// Route::group(['prefix' => 'students', 'as' => 'student'], function () {
+//     Route::get('/{id}', [StudentController::class, 'show'])->name('show');
+//     Route::get('/', [StudentController::class, 'index'])->name('index');
+//     Route::post('/', [StudentController::class, 'store'])->name('store');
+//     Route::put('/{id}', [StudentController::class, 'update'])->name('update');
+//     Route::delete('/{id}', [StudentController::class, 'destroy'])->name('destroy');
+// });
+Route::apiResource('students', StudentController::class);
+Route::apiResource('schools', SchoolController::class);

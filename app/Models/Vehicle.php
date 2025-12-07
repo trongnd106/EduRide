@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * App\Models\Student
- * @mixin \Eloquent
- */
-class Student extends Authenticatable
+class Vehicle extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -21,14 +17,11 @@ class Student extends Authenticatable
      */
     protected $fillable = [
         'school_id',
-        'student_number',
-        'email',
-        'full_name',
-        'phone',
-        'gender',
-        'dob',
-        'grade',
-        'address',
+        'plate_number',
+        'capacity',
+        'year',
+        'brand',
+        'status',
     ];
 
     /**
@@ -37,17 +30,16 @@ class Student extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'gender' => 'boolean',
-        'dob' => 'date',
-        'grade' => 'integer',
-        'status' => 'integer',
         'school_id' => 'integer',
+        'capacity' => 'integer',
+        'year' => 'integer',
+        'status' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the school that the student belongs to.
+     * Get the school that the vehicle belongs to.
      */
     public function school()
     {
