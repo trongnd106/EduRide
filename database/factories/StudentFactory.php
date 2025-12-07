@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\School;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -30,8 +31,10 @@ class StudentFactory extends Factory
         $firstName = $gender ? fake()->firstNameMale() : fake()->firstNameFemale();
         $lastName = fake()->lastName();
         
+        $schoolId = School::inRandomOrder()->value('id');
+        
         return [
-            'school_id' => fake()->numberBetween(1, 10),
+            'school_id' => $schoolId,
             'student_number' => 'SV' . fake()->unique()->numerify('######'),
             'email' => fake()->unique()->safeEmail(),
             'full_name' => $lastName . ' ' . $firstName,
