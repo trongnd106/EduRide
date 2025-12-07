@@ -11,4 +11,4 @@ ssh -i ~/.ssh/id_rsa ubuntu@34.61.124.56
 ```
 ### 3. Route cơ bản:
 - DB: 8001 : http://34.61.124.56:8001 - U/P: hust_user/root
-- Swagger: http://34.61.124.56:8000/api/documentation
+- Swagger: http://34.61.124.56/api/documentation
