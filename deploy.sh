@@ -21,6 +21,15 @@ docker-compose -f docker-compose.prod.yml down
 echo "✅ Starting new containers..."
 docker-compose -f docker-compose.prod.yml up -d
 
+# Đợi MySQL sẵn sàng
+echo "⏳ Waiting for MySQL to be ready..."
+sleep 10
+until docker exec hust_prod_db mysqladmin ping -h localhost -u root -p"${DB_ROOT_PASSWORD}" --silent 2>/dev/null; do
+    echo "   MySQL is starting up..."
+    sleep 5
+done
+echo "✅ MySQL is ready!"
+
 # Chạy migrations (nếu cần)
 echo "📊 Running migrations..."
 docker exec hust_prod_php php artisan migrate --force
