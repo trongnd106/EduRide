@@ -1,9 +1,6 @@
 ## Introduction
 Codebase laravel được tạo ra với mục đích tăng tốc độ phát triển dự án bằng cách build sẵn các thành phần cơ bản.
 
-Source code phân chia thành 2 domain dành cho
-* Backend api: phục vụ cho client frontend
-
 ## Requirements
 * php >=8.1
 

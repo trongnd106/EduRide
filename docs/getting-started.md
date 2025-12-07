@@ -42,15 +42,15 @@ cp .env.example .env
 Edit file hosts, thêm vào 2 dòng dưới đây
 
 ```
-127.0.0.1 kaopiz.frontend.base
-127.0.0.1 kaopiz.backend.base
+127.0.0.1 eduride.frontend.base
+127.0.0.1 eduride.backend.base
 ```
 
 Đây là 2 domain mặc định cho backend và admin. Nếu muốn sử dụng domain khác, thay đổi nội dung file hosts cùng với các biến trong file `.env`
 
 ```dotenv
-FRONTEND_LOCAL_DOMAIN=kaopiz.frontend.base
-BACKEND_LOCAL_DOMAIN=kaopiz.backend.base
+FRONTEND_LOCAL_DOMAIN=eduride.frontend.base
+BACKEND_LOCAL_DOMAIN=eduride.backend.base
 ```
 
 Lưu ý: để thay đổi phương thức Routing này, cần tham khảo **[Routing](routing.md)**
