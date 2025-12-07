@@ -3,6 +3,7 @@
 use App\Http\Controllers\SchoolController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +29,4 @@ Route::get('/', function () {
 // });
 Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
+Route::apiResource('drivers', DriverController::class);

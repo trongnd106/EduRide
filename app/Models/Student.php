@@ -29,6 +29,7 @@ class Student extends Authenticatable
         'dob',
         'grade',
         'address',
+        'status',
     ];
 
     /**
