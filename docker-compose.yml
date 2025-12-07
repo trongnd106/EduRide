@@ -1,0 +1,70 @@
+services:
+    php:
+        image: "${APP_IMAGE_NAME:-$APP_NAME}_${APP_ENV}_php"
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                - "APP_DEBUG=${APP_DEBUG}"
+                - "APP_ENV=${APP_ENV}"
+        container_name: "${APP_NAME}_${APP_ENV}_php"
+        restart: unless-stopped
+        environment:
+            - "XDG_CONFIG_HOME=/var/www"
+            - "XDEBUG_CONFIG=client_host=host.docker.internal"
+            - "PHP_IDE_CONFIG=serverName=localhost"
+        volumes:
+            - "./:/var/www"
+            - "./storage/logs/worker/:/var/log/supervisor/"
+        ports:
+            - ${APP_PORT}:80
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        depends_on:
+            - db
+        networks:
+            - hust_net
+
+    db:
+        image: mysql:${MYSQL_VERSION}
+        container_name: "${APP_NAME}_${APP_ENV}_db"
+        restart: unless-stopped
+        environment:
+            - "MYSQL_DATABASE=${DB_DATABASE}"
+            - "MYSQL_USER=${DB_USERNAME}"
+            - "MYSQL_PASSWORD=${DB_PASSWORD}"
+            - "MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
+        ports:
+            - "${DB_EXPOSE_PORT:-$DB_PORT}:${DB_PORT}"
+        volumes:
+            - ".docker/mysql/data:/var/lib/mysql"
+            - ".docker/mysql/my.cnf:/etc/mysql/my.cnf"
+        networks:
+            - hust_net
+    redis:
+        image: redis:alpine
+        container_name: "${APP_NAME}_${APP_ENV}_redis"
+        restart: unless-stopped
+        environment:
+            - "REDIS_PASSWORD=${REDIS_PASSWORD}"
+        command:
+            - /bin/sh
+            - -c
+            - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+        ports:
+            - "${REDIS_EXPOSE_PORT:-$REDIS_PORT}:${REDIS_PORT}"
+        volumes:
+            - ".docker/redis/data:/data"
+        networks:
+            - hust_net
+    adminer:
+        image: adminer
+        container_name: "${APP_NAME}_adminer"
+        restart: unless-stopped
+        ports:
+            - 8001:8080
+        networks:
+            - hust_net
+networks:
+    hust_net:
+        driver: bridge

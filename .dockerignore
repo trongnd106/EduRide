@@ -1,0 +1,6 @@
+vendor
+node_modules
+
+# Data
+.docker/mysql/data
+.docker/redis/data

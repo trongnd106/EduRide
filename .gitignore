@@ -1,0 +1,28 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/storage/logs
+/storage/api-docs
+/vendor
+.env
+.env.testing
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+.rnd
+supervisord.pid
+xdebug.log
+.phpunit.cache
+
+# Code Style Cache
+.php_cs.cache
+
+# Docker Data
+.docker/**/data
