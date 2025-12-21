@@ -32,15 +32,18 @@ class DriverFactory extends Factory
         $lastName = fake()->lastName();
 
         $schoolId = School::inRandomOrder()->value('id');
+        $age = fake()->numberBetween(25, 60);
 
         return [
             'full_name' => $lastName . ' ' . $firstName,
             'cccd' => fake()->unique()->numerify('##########'),
             'phone' => '0' . fake()->randomElement(['3', '5', '7', '8', '9']) . fake()->numerify('########'),
+            'email' => fake()->unique()->safeEmail(),
             'gender' => $gender,
             'license_number' => fake()->randomElement(['A', 'B', 'C', 'D', 'E', 'F']) . fake()->numerify('#######'),
-            'license_expiry' => fake()->dateTimeBetween('+1 year', '+5 years')->format('Y-m-d'),
-            'dob' => fake()->dateTimeBetween('-60 years', '-25 years')->format('Y-m-d'),
+            'age' => $age,
+            'address' => fake()->address(),
+            'image_url' => fake()->optional()->imageUrl(200, 200, 'people', true, $lastName . ' ' . $firstName),
             'school_id' => $schoolId,
             'status' => fake()->randomElement([0, 1]),
         ];
