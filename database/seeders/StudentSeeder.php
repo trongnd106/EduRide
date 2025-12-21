@@ -34,7 +34,9 @@ class StudentSeeder extends Seeder
             'grade' => 4,
             'status' => 1,
             'address' => 'Ngõ 19 Duy Tân, Quận Nam Từ Liêm, Hà Nội',
-            'school_id' => 1,
+            'student_parent_id' => 1,
+            'latitude' => 21.028511,
+            'longitude' => 105.804817,
         ]);
 
         Student::factory()->create([
@@ -47,7 +49,9 @@ class StudentSeeder extends Seeder
             'grade' => 11,
             'status' => 1,
             'address' => '456 Lê Lợi, Quận Cầu Giấy, Hà Nội',
-            'school_id' => 1,
+            'student_parent_id' => 2,
+            'latitude' => 21.030000,
+            'longitude' => 105.800000,
         ]);
     }
 }

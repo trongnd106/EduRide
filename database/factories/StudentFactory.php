@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\School;
 use App\Models\Student;
+use App\Models\StudentParent;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,10 +31,14 @@ class StudentFactory extends Factory
         $firstName = $gender ? fake()->firstNameMale() : fake()->firstNameFemale();
         $lastName = fake()->lastName();
         
-        $schoolId = School::inRandomOrder()->value('id');
+        $parentId = StudentParent::inRandomOrder()->value('id');
+        
+        // Tọa độ GPS Hà Nội (khoảng)
+        $latitude = fake()->randomFloat(8, 20.8, 21.2);
+        $longitude = fake()->randomFloat(8, 105.6, 106.0);
         
         return [
-            'school_id' => $schoolId,
+            'student_parent_id' => $parentId,
             'student_number' => 'SV' . fake()->unique()->numerify('######'),
             'email' => fake()->unique()->safeEmail(),
             'full_name' => $lastName . ' ' . $firstName,
@@ -44,6 +48,8 @@ class StudentFactory extends Factory
             'grade' => fake()->randomElement([10, 11, 12]),
             'status' => fake()->randomElement([0, 1]),
             'address' => fake()->address(),
+            'latitude' => $latitude,
+            'longitude' => $longitude,
         ];
     }
 

@@ -20,7 +20,7 @@ class Student extends Authenticatable
      * @var array<string>
      */
     protected $fillable = [
-        'school_id',
+        'student_parent_id',
         'student_number',
         'email',
         'full_name',
@@ -29,6 +29,8 @@ class Student extends Authenticatable
         'dob',
         'grade',
         'address',
+        'latitude',
+        'longitude',
         'status',
     ];
 
@@ -42,16 +44,18 @@ class Student extends Authenticatable
         'dob' => 'date',
         'grade' => 'integer',
         'status' => 'integer',
-        'school_id' => 'integer',
+        'student_parent_id' => 'integer',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the school that the student belongs to.
+     * Get the parent that the student belongs to.
      */
-    public function school()
+    public function parent()
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(StudentParent::class, 'student_parent_id');
     }
 }

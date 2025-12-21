@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\StudentParentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +33,4 @@ Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
 Route::apiResource('drivers', DriverController::class);
 Route::apiResource('vehicles', VehicleController::class);
+Route::apiResource('student-parents', StudentParentController::class);

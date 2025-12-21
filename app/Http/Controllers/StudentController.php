@@ -33,7 +33,7 @@ class StudentController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=73),
-     *             @OA\Property(property="school_id", type="integer", nullable=true, example=null),
+     *             @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="student_number", type="string", example="20225105"),
      *             @OA\Property(property="email", type="string", format="email", example="nam.nguyen225105@sis.hust.edu.vn"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
@@ -43,6 +43,8 @@ class StudentController extends Controller
      *             @OA\Property(property="grade", type="integer", example=4),
      *             @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=0),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *             @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511, description="Vĩ độ GPS"),
+     *             @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817, description="Kinh độ GPS"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z"),
      *             @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true, example=null)
@@ -141,6 +143,13 @@ class StudentController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", example="Hà Nội")
      *     ),
+     *     @OA\Parameter(
+     *         name="student_parent_id__equal",
+     *         in="query",
+     *         description="Filter by student parent ID (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -157,6 +166,9 @@ class StudentController extends Controller
      *                     @OA\Property(property="dob", type="string", format="date", example="2003-09-20"),
      *                     @OA\Property(property="grade", type="integer", example=12),
      *                     @OA\Property(property="address", type="string", example="921 Burnice Squares\nLake Clyde, LA 55839"),
+     *                     @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
+     *                     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511),
+     *                     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817),
      *                     @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=1)
      *                 )
      *             ),
@@ -184,6 +196,9 @@ class StudentController extends Controller
             'dob',
             'grade',
             'address',
+            'student_parent_id',
+            'latitude',
+            'longitude',
             'status'
         ];
         $result = $this->service->paginate($request->all(), [], $column);
@@ -211,7 +226,9 @@ class StudentController extends Controller
      *             @OA\Property(property="dob", type="string", format="date", example="2004-05-15", description="Ngày sinh (format: Y-m-d)"),
      *             @OA\Property(property="grade", type="integer", example=4, description="Khối lớp (optional)"),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội", description="Địa chỉ (optional)"),
-     *             @OA\Property(property="school_id", type="integer", example=1, description="ID trường học (optional)"),
+     *             @OA\Property(property="student_parent_id", type="integer", example=1, description="ID phụ huynh (optional)"),
+     *             @OA\Property(property="latitude", type="number", format="float", example=21.028511, description="Vĩ độ GPS (optional)"),
+     *             @OA\Property(property="longitude", type="number", format="float", example=105.804817, description="Kinh độ GPS (optional)"),
      *             @OA\Property(property="status", type="integer", example=0, description="Trạng thái (0 = Đang học, 1 = Tốt nghiệp, optional, default: 0)")
      *         )
      *     ),
@@ -221,6 +238,7 @@ class StudentController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=73),
+     *             @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="student_number", type="string", example="20225105"),
      *             @OA\Property(property="email", type="string", format="email", example="nam.nguyen225105@sis.hust.edu.vn"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
@@ -229,6 +247,8 @@ class StudentController extends Controller
      *             @OA\Property(property="dob", type="string", format="date", example="2004-05-15"),
      *             @OA\Property(property="grade", type="integer", example=4),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *             @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511),
+     *             @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z")
      *         )
@@ -286,7 +306,9 @@ class StudentController extends Controller
      *             @OA\Property(property="dob", type="string", format="date", example="2004-05-15", description="Ngày sinh (format: Y-m-d)"),
      *             @OA\Property(property="grade", type="integer", example=4, description="Khối lớp (optional)"),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội", description="Địa chỉ (optional)"),
-     *             @OA\Property(property="school_id", type="integer", example=1, description="ID trường học (optional)"),
+     *             @OA\Property(property="student_parent_id", type="integer", example=1, description="ID phụ huynh (optional)"),
+     *             @OA\Property(property="latitude", type="number", format="float", example=21.028511, description="Vĩ độ GPS (optional)"),
+     *             @OA\Property(property="longitude", type="number", format="float", example=105.804817, description="Kinh độ GPS (optional)"),
      *             @OA\Property(property="status", type="integer", example=0, description="Trạng thái (0 = Đang học, 1 = Tốt nghiệp, optional)")
      *         )
      *     ),
@@ -296,6 +318,7 @@ class StudentController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=73),
+     *             @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="student_number", type="string", example="20225105"),
      *             @OA\Property(property="email", type="string", format="email", example="nam.nguyen225105@sis.hust.edu.vn"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
@@ -304,6 +327,8 @@ class StudentController extends Controller
      *             @OA\Property(property="dob", type="string", format="date", example="2004-05-15"),
      *             @OA\Property(property="grade", type="integer", example=4),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *             @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511),
+     *             @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z")
      *         )
