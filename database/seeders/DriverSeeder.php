@@ -23,33 +23,37 @@ class DriverSeeder extends Seeder
         // Create 10 female drivers who are active
         Driver::factory()->count(10)->female()->active()->create();
 
-        // Create some drivers with specific data (example)
-        Driver::factory()->create([
-            'full_name' => 'Nguyễn Văn An',
-            'cccd' => '001234567890',
-            'phone' => '0987654321',
-            'email' => 'nguyenvanan@example.com',
-            'gender' => 1,
-            'license_number' => 'A1234567',
-            'age' => 39,
-            'address' => '123 Đường Láng, Quận Đống Đa, Hà Nội',
-            'image_url' => null,
-            'school_id' => 1,
-            'status' => 1,
-        ]);
+        // Create some drivers with specific data (example) - using updateOrCreate to avoid duplicates
+        Driver::updateOrCreate(
+            ['cccd' => '001234567890'],
+            [
+                'full_name' => 'Nguyễn Văn An',
+                'phone' => '0987654321',
+                'email' => 'nguyenvanan@example.com',
+                'gender' => 1,
+                'license_number' => 'A1234567',
+                'age' => 39,
+                'address' => '123 Đường Láng, Quận Đống Đa, Hà Nội',
+                'image_url' => null,
+                'school_id' => 1,
+                'status' => 1,
+            ]
+        );
 
-        Driver::factory()->create([
-            'full_name' => 'Trần Thị Bình',
-            'cccd' => '001234567891',
-            'phone' => '0987654322',
-            'email' => 'tranthibinh@example.com',
-            'gender' => 0,
-            'license_number' => 'B1234567',
-            'age' => 34,
-            'address' => '456 Lê Lợi, Quận Cầu Giấy, Hà Nội',
-            'image_url' => null,
-            'school_id' => 1,
-            'status' => 1,
-        ]);
+        Driver::updateOrCreate(
+            ['cccd' => '001234567891'],
+            [
+                'full_name' => 'Trần Thị Bình',
+                'phone' => '0987654322',
+                'email' => 'tranthibinh@example.com',
+                'gender' => 0,
+                'license_number' => 'B1234567',
+                'age' => 34,
+                'address' => '456 Lê Lợi, Quận Cầu Giấy, Hà Nội',
+                'image_url' => null,
+                'school_id' => 1,
+                'status' => 1,
+            ]
+        );
     }
 }
