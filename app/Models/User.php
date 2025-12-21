@@ -21,6 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $email
  * @property string $password
  * @property int $status
+ * @property int|null $type
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -65,6 +66,7 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'status',
+        'type',
     ];
 
     /**
@@ -88,6 +90,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'status' => 'integer',
+        'type' => 'integer',
     ];
 
     protected function serializeDate(\DateTimeInterface $date): string
