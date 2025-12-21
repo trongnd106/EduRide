@@ -19,8 +19,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property int $id
  * @property string $username
  * @property string $email
- * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password
+ * @property int $status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -44,8 +44,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder|User role($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
@@ -87,7 +87,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'status' => 'integer',
     ];
 
     protected function serializeDate(\DateTimeInterface $date): string
@@ -110,5 +110,21 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn() => $this->last_access && Carbon::parse($this->last_access)->gt(now()->subMinutes(AppConst::LAST_ACCESS_THRESHOLD))
         );
+    }
+
+    /**
+     * Get the driver associated with the user.
+     */
+    public function driver()
+    {
+        return $this->hasOne(Driver::class);
+    }
+
+    /**
+     * Get the student parent associated with the user.
+     */
+    public function studentParent()
+    {
+        return $this->hasOne(StudentParent::class);
     }
 }

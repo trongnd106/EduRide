@@ -33,6 +33,7 @@ class DriverController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", nullable=true, example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn A"),
      *             @OA\Property(property="cccd", type="string", example="001234567890"),
      *             @OA\Property(property="phone", type="string", example="0987654321"),
@@ -145,6 +146,7 @@ class DriverController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn A"),
      *                     @OA\Property(property="cccd", type="string", example="001234567890"),
      *                     @OA\Property(property="phone", type="string", example="0987654321"),
@@ -190,6 +192,7 @@ class DriverController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             required={"full_name", "cccd", "gender", "license_number"},
+     *             @OA\Property(property="user_id", type="integer", example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn A", description="Họ và tên đầy đủ (bắt buộc)"),
      *             @OA\Property(property="cccd", type="string", example="001234567890", description="Số CCCD/CMND (bắt buộc, unique)"),
      *             @OA\Property(property="phone", type="string", example="0987654321", description="Số điện thoại (optional)"),
@@ -270,6 +273,7 @@ class DriverController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
+     *             @OA\Property(property="user_id", type="integer", example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn A", description="Họ và tên đầy đủ"),
      *             @OA\Property(property="cccd", type="string", example="001234567890", description="Số CCCD/CMND (unique)"),
      *             @OA\Property(property="phone", type="string", example="0987654321", description="Số điện thoại (optional)"),
@@ -290,6 +294,7 @@ class DriverController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn A"),
      *             @OA\Property(property="cccd", type="string", example="001234567890"),
      *             @OA\Property(property="phone", type="string", example="0987654321"),

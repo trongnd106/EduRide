@@ -16,6 +16,7 @@ class Driver extends Model
      * @var array<string>
      */
     protected $fillable = [
+        'user_id',
         'full_name',
         'cccd',
         'phone',
@@ -36,6 +37,7 @@ class Driver extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'user_id' => 'integer',
         'gender' => 'integer',
         'age' => 'integer',
         'school_id' => 'integer',
@@ -44,6 +46,14 @@ class Driver extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Get the user that the driver belongs to.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Get the school that the driver belongs to.
