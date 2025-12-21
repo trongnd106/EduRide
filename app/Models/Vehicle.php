@@ -15,11 +15,13 @@ class Vehicle extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'school_id',
+        'type',
         'plate_number',
         'capacity',
         'year',
         'brand',
+        'model',
+        'color',
         'status',
     ];
 
@@ -29,19 +31,11 @@ class Vehicle extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'school_id' => 'integer',
+        'type' => 'integer',
         'capacity' => 'integer',
         'year' => 'integer',
         'status' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Get the school that the vehicle belongs to.
-     */
-    public function school()
-    {
-        return $this->belongsTo(School::class);
-    }
 }
