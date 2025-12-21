@@ -19,10 +19,12 @@ class Driver extends Model
         'full_name',
         'cccd',
         'phone',
+        'email',
         'gender',
         'license_number',
-        'license_expiry',
-        'dob',
+        'age',
+        'address',
+        'image_url',
         'school_id',
         'status',
     ];
@@ -34,8 +36,7 @@ class Driver extends Model
      */
     protected $casts = [
         'gender' => 'integer',
-        'license_expiry' => 'date',
-        'dob' => 'date',
+        'age' => 'integer',
         'school_id' => 'integer',
         'status' => 'integer',
         'created_at' => 'datetime',
