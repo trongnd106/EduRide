@@ -36,4 +36,12 @@ class StudentParent extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Get the students for the parent.
+     */
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'student_parent_id');
+    }
 }
