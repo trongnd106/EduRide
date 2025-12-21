@@ -6,6 +6,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\StudentParentController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,4 @@ Route::apiResource('schools', SchoolController::class);
 Route::apiResource('drivers', DriverController::class);
 Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('student-parents', StudentParentController::class);
+Route::apiResource('users', UserController::class);
