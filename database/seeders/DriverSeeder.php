@@ -37,6 +37,7 @@ class DriverSeeder extends Seeder
                 'image_url' => null,
                 'school_id' => 1,
                 'status' => 1,
+                'position' => 1, // Tài xế
             ]
         );
 
@@ -53,6 +54,7 @@ class DriverSeeder extends Seeder
                 'image_url' => null,
                 'school_id' => 1,
                 'status' => 1,
+                'position' => 2, // Phụ xe
             ]
         );
     }

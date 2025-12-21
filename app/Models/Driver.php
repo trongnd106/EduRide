@@ -27,6 +27,7 @@ class Driver extends Model
         'image_url',
         'school_id',
         'status',
+        'position',
     ];
 
     /**
@@ -39,6 +40,7 @@ class Driver extends Model
         'age' => 'integer',
         'school_id' => 'integer',
         'status' => 'integer',
+        'position' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
