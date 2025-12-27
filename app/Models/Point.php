@@ -18,6 +18,7 @@ class Point extends Model
      * @var array<string>
      */
     protected $fillable = [
+        'address',
         'latitude',
         'longitude',
         'type',
