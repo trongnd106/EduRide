@@ -174,4 +174,164 @@ class TripController extends Controller
             return $this->service->assignStudents($tripId, $studentIds);
         }, 3);
     }
+
+    /**
+     * @OA\Get(
+     *     path="trips/{id}/points",
+     *     summary="Get all points of a trip",
+     *     description="Retrieves all points (điểm dừng) of a specific trip, ordered by sequence",
+     *     operationId="getTripPoints",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Points retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội", description="Địa chỉ điểm dừng"),
+     *                 @OA\Property(property="type", type="integer", example=1, description="0 = Điểm phụ, 1 = Điểm dừng"),
+     *                 @OA\Property(property="order", type="integer", example=1, description="Thứ tự điểm trong lộ trình")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getPoints($id): Response
+    {
+        $tripId = intval($id);
+        $points = $this->service->getTripPoints($tripId);
+        return $this->respond($points);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="trips/{id}/students",
+     *     summary="Get all students of a trip",
+     *     description="Retrieves all students assigned to a specific trip",
+     *     operationId="getTripStudents",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Students retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="student_id", type="integer", example=123),
+     *                 @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                 @OA\Property(property="grade", type="integer", example=10, description="Khối lớp")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getStudents($id): Response
+    {
+        $tripId = intval($id);
+        $students = $this->service->getTripStudents($tripId);
+        return $this->respond($students);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="trips/{trip_id}/points/{point_id}/students",
+     *     summary="Get students pickup/dropoff at a specific point",
+     *     description="Retrieves students who get on/off at a specific point of a trip",
+     *     operationId="getPointStudents",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="trip_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="point_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the point",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Point students data retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="point_id", type="integer", example=1),
+     *             @OA\Property(property="address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội"),
+     *             @OA\Property(property="type", type="integer", example=1, description="0 = Điểm phụ, 1 = Điểm dừng"),
+     *             @OA\Property(
+     *                 property="students_pickup",
+     *                 type="array",
+     *                 description="Danh sách học sinh lên xe tại điểm này",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="student_id", type="integer", example=123),
+     *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                     @OA\Property(property="grade", type="integer", example=10)
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="students_dropoff",
+     *                 type="array",
+     *                 description="Danh sách học sinh xuống xe tại điểm này",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="student_id", type="integer", example=124),
+     *                     @OA\Property(property="full_name", type="string", example="Trần Thị Bình"),
+     *                     @OA\Property(property="grade", type="integer", example=11)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip or Point not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getPointStudents($tripId, $pointId): Response
+    {
+        $tripId = intval($tripId);
+        $pointId = intval($pointId);
+        $data = $this->service->getPointStudents($tripId, $pointId);
+        return $this->respond($data);
+    }
 }

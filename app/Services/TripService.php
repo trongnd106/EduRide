@@ -73,5 +73,89 @@ class TripService extends BaseService
         
         return $trip;
     }
+
+    /**
+     * Get all points (ordered) for a specific trip.
+     *
+     * @param int $tripId
+     * @return array
+     */
+    public function getTripPoints(int $tripId): array
+    {
+        $trip = $this->show($tripId, ['points']);
+        
+        return $trip->points->map(function ($point) {
+            return [
+                'id' => $point->id,
+                'address' => $point->address,
+                'type' => $point->type,
+                'order' => $point->pivot->order,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get all students assigned to a specific trip.
+     *
+     * @param int $tripId
+     * @return array
+     */
+    public function getTripStudents(int $tripId): array
+    {
+        $trip = $this->show($tripId, ['students']);
+        
+        return $trip->students->map(function ($student) {
+            return [
+                'student_id' => $student->id,
+                'full_name' => $student->full_name,
+                'grade' => $student->grade,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get students pickup/dropoff at a specific point of a trip.
+     *
+     * @param int $tripId
+     * @param int $pointId
+     * @return array
+     */
+    public function getPointStudents(int $tripId, int $pointId): array
+    {
+        // Verify trip and point exist
+        $trip = $this->show($tripId);
+        $point = \App\Models\Point::findOrFail($pointId);
+        
+        // Get all point_students for this trip and point
+        $pointStudents = \App\Models\PointStudent::where('trip_id', $tripId)
+            ->where('point_id', $pointId)
+            ->with('student')
+            ->get();
+        
+        // Separate by type (0 = pickup, 1 = dropoff)
+        $studentsPickup = $pointStudents->where('type', 0)->map(function ($ps) {
+            return [
+                'student_id' => $ps->student_id,
+                'full_name' => $ps->student->full_name,
+                'grade' => $ps->student->grade,
+            ];
+        })->values()->toArray();
+        
+        $studentsDropoff = $pointStudents->where('type', 1)->map(function ($ps) {
+            return [
+                'student_id' => $ps->student_id,
+                'full_name' => $ps->student->full_name,
+                'grade' => $ps->student->grade,
+            ];
+        })->values()->toArray();
+        
+        return [
+            'point_id' => $point->id,
+            'address' => $point->address,
+            'type' => $point->type,
+            'students_pickup' => $studentsPickup,
+            'students_dropoff' => $studentsDropoff,
+        ];
+    }
 }
 
