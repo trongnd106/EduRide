@@ -93,5 +93,24 @@ class TripService extends BaseService
             ];
         })->toArray();
     }
+
+    /**
+     * Get all students assigned to a specific trip.
+     *
+     * @param int $tripId
+     * @return array
+     */
+    public function getTripStudents(int $tripId): array
+    {
+        $trip = $this->show($tripId, ['students']);
+        
+        return $trip->students->map(function ($student) {
+            return [
+                'student_id' => $student->id,
+                'full_name' => $student->full_name,
+                'grade' => $student->grade,
+            ];
+        })->toArray();
+    }
 }
 

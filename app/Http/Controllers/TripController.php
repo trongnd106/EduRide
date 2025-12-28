@@ -219,4 +219,48 @@ class TripController extends Controller
         $points = $this->service->getTripPoints($tripId);
         return $this->respond($points);
     }
+
+    /**
+     * @OA\Get(
+     *     path="trips/{id}/students",
+     *     summary="Get all students of a trip",
+     *     description="Retrieves all students assigned to a specific trip",
+     *     operationId="getTripStudents",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Students retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="student_id", type="integer", example=123),
+     *                 @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                 @OA\Property(property="grade", type="integer", example=10, description="Khối lớp"),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getStudents($id): Response
+    {
+        $tripId = intval($id);
+        $students = $this->service->getTripStudents($tripId);
+        return $this->respond($students);
+    }
 }
