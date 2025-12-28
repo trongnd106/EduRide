@@ -58,4 +58,30 @@ class Student extends Authenticatable
     {
         return $this->belongsTo(StudentParent::class, 'student_parent_id');
     }
+
+    /**
+     * Get the trip students that belong to this student.
+     */
+    public function tripStudents()
+    {
+        return $this->hasMany(TripStudent::class);
+    }
+
+    /**
+     * Get the point students that belong to this student.
+     */
+    public function pointStudents()
+    {
+        return $this->hasMany(PointStudent::class);
+    }
+
+    /**
+     * Get the trips that this student belongs to through trip_students.
+     */
+    public function trips()
+    {
+        return $this->belongsToMany(Trip::class, 'trip_students', 'student_id', 'trip_id')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
 }

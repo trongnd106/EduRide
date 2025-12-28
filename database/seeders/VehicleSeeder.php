@@ -25,29 +25,35 @@ class VehicleSeeder extends Seeder
 
         // Create some vehicles with specific data (example)
         Vehicle::factory()->create([
-            'school_id' => 1,
+            'type' => 1,
             'plate_number' => '30A-12345',
             'capacity' => 16,
             'year' => 2020,
             'brand' => 'Ford Transit',
+            'model' => 'Transit 350',
+            'color' => 'Trắng',
             'status' => 1,
         ]);
 
         Vehicle::factory()->create([
-            'school_id' => 1,
+            'type' => 2,
             'plate_number' => '30B-67890',
             'capacity' => 29,
             'year' => 2021,
             'brand' => 'Mercedes Sprinter',
+            'model' => 'Sprinter 316',
+            'color' => 'Đen',
             'status' => 1,
         ]);
 
         Vehicle::factory()->create([
-            'school_id' => 1,
+            'type' => 1,
             'plate_number' => '29A-11111',
             'capacity' => 24,
             'year' => 2019,
             'brand' => 'Toyota Hiace',
+            'model' => 'Hiace 2020',
+            'color' => 'Bạc',
             'status' => 0,
         ]);
     }

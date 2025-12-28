@@ -33,11 +33,13 @@ class VehicleController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="school_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="type", type="integer", example=1, description="Loại xe"),
      *             @OA\Property(property="plate_number", type="string", example="30A-12345"),
      *             @OA\Property(property="capacity", type="integer", example=16),
      *             @OA\Property(property="year", type="integer", example=2020),
      *             @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *             @OA\Property(property="model", type="string", example="Transit 350"),
+     *             @OA\Property(property="color", type="string", example="Trắng"),
      *             @OA\Property(property="status", type="integer", description="0 = Không hoạt động, 1 = Đang hoạt động", example=1),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z"),
@@ -110,9 +112,9 @@ class VehicleController extends Controller
      *         @OA\Schema(type="string", example="Ford")
      *     ),
      *     @OA\Parameter(
-     *         name="school_id__equal",
+     *         name="type__equal",
      *         in="query",
-     *         description="Filter by school ID (exact match)",
+     *         description="Filter by type (exact match)",
      *         required=false,
      *         @OA\Schema(type="integer", example=1)
      *     ),
@@ -132,11 +134,13 @@ class VehicleController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="school_id", type="integer", nullable=true, example=1),
+     *                     @OA\Property(property="type", type="integer", example=1),
      *                     @OA\Property(property="plate_number", type="string", example="30A-12345"),
      *                     @OA\Property(property="capacity", type="integer", example=16),
      *                     @OA\Property(property="year", type="integer", example=2020),
      *                     @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *                     @OA\Property(property="model", type="string", example="Transit 350"),
+     *                     @OA\Property(property="color", type="string", example="Trắng"),
      *                     @OA\Property(property="status", type="integer", description="0 = Không hoạt động, 1 = Đang hoạt động", example=1)
      *                 )
      *             ),
@@ -171,11 +175,13 @@ class VehicleController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             required={"plate_number", "capacity"},
-     *             @OA\Property(property="school_id", type="integer", example=1, description="ID trường học (optional)"),
+     *             @OA\Property(property="type", type="integer", example=1, description="Loại xe (optional)"),
      *             @OA\Property(property="plate_number", type="string", example="30A-12345", description="Biển số xe (bắt buộc, unique)"),
      *             @OA\Property(property="capacity", type="integer", example=16, description="Sức chứa (số chỗ ngồi, bắt buộc)"),
      *             @OA\Property(property="year", type="integer", example=2020, description="Năm sản xuất (optional)"),
      *             @OA\Property(property="brand", type="string", example="Ford Transit", description="Hãng xe (optional)"),
+     *             @OA\Property(property="model", type="string", example="Transit 350", description="Model xe (optional)"),
+     *             @OA\Property(property="color", type="string", example="Trắng", description="Màu sắc (optional)"),
      *             @OA\Property(property="status", type="integer", example=1, description="Trạng thái (0 = Không hoạt động, 1 = Đang hoạt động, optional, default: 0)")
      *         )
      *     ),
@@ -185,11 +191,13 @@ class VehicleController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="school_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="type", type="integer", example=1),
      *             @OA\Property(property="plate_number", type="string", example="30A-12345"),
      *             @OA\Property(property="capacity", type="integer", example=16),
      *             @OA\Property(property="year", type="integer", example=2020),
      *             @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *             @OA\Property(property="model", type="string", example="Transit 350"),
+     *             @OA\Property(property="color", type="string", example="Trắng"),
      *             @OA\Property(property="status", type="integer", example=1),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z")
@@ -240,11 +248,13 @@ class VehicleController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="school_id", type="integer", example=1, description="ID trường học (optional)"),
+     *             @OA\Property(property="type", type="integer", example=1, description="Loại xe (optional)"),
      *             @OA\Property(property="plate_number", type="string", example="30A-12345", description="Biển số xe (unique)"),
      *             @OA\Property(property="capacity", type="integer", example=16, description="Sức chứa (số chỗ ngồi)"),
      *             @OA\Property(property="year", type="integer", example=2020, description="Năm sản xuất (optional)"),
      *             @OA\Property(property="brand", type="string", example="Ford Transit", description="Hãng xe (optional)"),
+     *             @OA\Property(property="model", type="string", example="Transit 350", description="Model xe (optional)"),
+     *             @OA\Property(property="color", type="string", example="Trắng", description="Màu sắc (optional)"),
      *             @OA\Property(property="status", type="integer", example=1, description="Trạng thái (0 = Không hoạt động, 1 = Đang hoạt động)")
      *         )
      *     ),
@@ -254,11 +264,13 @@ class VehicleController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="school_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="type", type="integer", example=1),
      *             @OA\Property(property="plate_number", type="string", example="30A-12345"),
      *             @OA\Property(property="capacity", type="integer", example=16),
      *             @OA\Property(property="year", type="integer", example=2020),
      *             @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *             @OA\Property(property="model", type="string", example="Transit 350"),
+     *             @OA\Property(property="color", type="string", example="Trắng"),
      *             @OA\Property(property="status", type="integer", example=1),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z")

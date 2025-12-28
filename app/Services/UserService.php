@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserService extends BaseService
 {
-    public function model(): string
+    public function model()
     {
         return User::class;
     }

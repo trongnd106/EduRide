@@ -33,6 +33,7 @@ class StudentParentController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", nullable=true, example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
      *             @OA\Property(property="phone_number", type="string", example="0987654321"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-21T13:57:19.000000Z"),
@@ -100,6 +101,7 @@ class StudentParentController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
      *                     @OA\Property(property="phone_number", type="string", example="0987654321")
      *                 )
@@ -135,6 +137,7 @@ class StudentParentController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             required={"full_name", "phone_number"},
+     *             @OA\Property(property="user_id", type="integer", example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn An", description="Họ và tên đầy đủ (bắt buộc)"),
      *             @OA\Property(property="phone_number", type="string", example="0987654321", description="Số điện thoại (bắt buộc)")
      *         )
@@ -145,6 +148,7 @@ class StudentParentController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
      *             @OA\Property(property="phone_number", type="string", example="0987654321"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-21T13:57:19.000000Z"),
@@ -196,6 +200,7 @@ class StudentParentController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
+     *             @OA\Property(property="user_id", type="integer", example=1, description="ID người dùng (optional)"),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn An", description="Họ và tên đầy đủ"),
      *             @OA\Property(property="phone_number", type="string", example="0987654321", description="Số điện thoại")
      *         )
@@ -206,6 +211,7 @@ class StudentParentController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *             @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
      *             @OA\Property(property="phone_number", type="string", example="0987654321"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-21T13:57:19.000000Z"),

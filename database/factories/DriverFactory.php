@@ -64,6 +64,7 @@ class DriverFactory extends Factory
             'image_url' => fake()->optional()->imageUrl(200, 200, 'people', true, $fullName),
             'school_id' => $schoolId,
             'status' => fake()->randomElement([0, 1]),
+            'position' => fake()->randomElement([1, 2]), // 1 = Tài xế, 2 = Phụ xe
         ];
     }
 

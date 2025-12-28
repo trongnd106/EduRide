@@ -6,6 +6,8 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\StudentParentController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\TripController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +36,11 @@ Route::apiResource('schools', SchoolController::class);
 Route::apiResource('drivers', DriverController::class);
 Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('student-parents', StudentParentController::class);
+Route::apiResource('users', UserController::class);
+Route::apiResource('trips', TripController::class);
+
+// Custom routes for trips
+Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
+    Route::post('/', [TripController::class, 'create'])->name('create');
+    Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
+});
