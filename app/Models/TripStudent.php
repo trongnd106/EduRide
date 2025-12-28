@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TripStudent extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     /**
      * Indicates if the model's ID is auto-incrementing.
@@ -32,7 +33,6 @@ class TripStudent extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'id',
         'trip_id',
         'student_id',
         'status',
