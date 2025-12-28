@@ -45,4 +45,5 @@ Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
     Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
     Route::get('{id}/points', [TripController::class, 'getPoints'])->name('points');
     Route::get('{id}/students', [TripController::class, 'getStudents'])->name('students');
+    Route::get('{trip_id}/points/{point_id}/students', [TripController::class, 'getPointStudents'])->name('point-students');
 });
