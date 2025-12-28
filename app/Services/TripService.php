@@ -73,5 +73,25 @@ class TripService extends BaseService
         
         return $trip;
     }
+
+    /**
+     * Get all points (ordered) for a specific trip.
+     *
+     * @param int $tripId
+     * @return array
+     */
+    public function getTripPoints(int $tripId): array
+    {
+        $trip = $this->show($tripId, ['points']);
+        
+        return $trip->points->map(function ($point) {
+            return [
+                'id' => $point->id,
+                'address' => $point->address,
+                'type' => $point->type,
+                'order' => $point->pivot->order,
+            ];
+        })->toArray();
+    }
 }
 

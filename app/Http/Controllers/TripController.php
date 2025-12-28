@@ -174,4 +174,49 @@ class TripController extends Controller
             return $this->service->assignStudents($tripId, $studentIds);
         }, 3);
     }
+
+    /**
+     * @OA\Get(
+     *     path="trips/{id}/points",
+     *     summary="Get all points of a trip",
+     *     description="Retrieves all points (điểm dừng) of a specific trip, ordered by sequence",
+     *     operationId="getTripPoints",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Points retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội", description="Địa chỉ điểm dừng"),
+     *                 @OA\Property(property="type", type="integer", example=1, description="0 = Điểm phụ, 1 = Điểm dừng"),
+     *                 @OA\Property(property="order", type="integer", example=1, description="Thứ tự điểm trong lộ trình"),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getPoints($id): Response
+    {
+        $tripId = intval($id);
+        $points = $this->service->getTripPoints($tripId);
+        return $this->respond($points);
+    }
 }
