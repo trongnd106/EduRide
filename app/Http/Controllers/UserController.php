@@ -8,6 +8,7 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -194,6 +195,21 @@ class UserController extends Controller
             
             // Create user
             $user = $this->service->store($attributes);
+            
+            // Assign role based on type
+            if ($type == 1) {
+                // Type 1 = Phụ huynh: Assign role id = 2
+                $role = Role::find(2);
+                if ($role) {
+                    $user->assignRole($role);
+                }
+            } elseif ($type == 2) {
+                // Type 2 = Phụ xe: Assign role id = 3
+                $role = Role::find(3);
+                if ($role) {
+                    $user->assignRole($role);
+                }
+            }
             
             // Create related record based on type
             if ($type == 1 && $fullName && $phoneNumber) {
