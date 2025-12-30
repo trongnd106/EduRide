@@ -19,7 +19,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="users/{id}",
+     *     path="/api/v1/users/{id}",
      *     summary="Get user by ID",
      *     description="Retrieves detailed information about a user by their ID",
      *     operationId="getUserById",
@@ -62,7 +62,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="users",
+     *     path="/api/v1/users",
      *     summary="Get a paginated list of users",
      *     description="Retrieves a paginated list of users with optional filtering",
      *     operationId="getUsersList",
@@ -131,7 +131,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="users",
+     *     path="/api/v1/users",
      *     summary="Create a new user",
      *     description="Creates a new user with the provided information. If type = 1 (Phụ huynh), creates a student_parent record. If type = 2 (Phụ xe), creates a driver record with position = 2.",
      *     operationId="createUser",
@@ -220,7 +220,7 @@ class UserController extends Controller
 
     /**
      * @OA\Put(
-     *     path="users/{id}",
+     *     path="/api/v1/users/{id}",
      *     summary="Update a user",
      *     description="Updates an existing user's information by ID. Can also update related student_parent or driver record.",
      *     operationId="updateUser",
@@ -338,7 +338,7 @@ class UserController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="users/{id}",
+     *     path="/api/v1/users/{id}",
      *     summary="Delete a user",
      *     description="Deletes a user by ID (soft delete)",
      *     operationId="deleteUser",

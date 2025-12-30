@@ -9,7 +9,7 @@ class AppConstantController
 {
     /**
      * @OA\Get(
-     *     path="/api/app-constants",
+     *     path="/api/v1/app-constants",
      *     summary="Get application constants",
      *     tags={"App Constants"},
      *     @OA\Response(

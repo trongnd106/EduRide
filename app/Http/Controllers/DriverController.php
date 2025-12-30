@@ -16,7 +16,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Get(
-     *     path="drivers/{id}",
+     *     path="/api/v1/drivers/{id}",
      *     summary="Get driver by ID",
      *     description="Retrieves detailed information about a driver by their ID",
      *     operationId="getDriverById",
@@ -69,7 +69,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Get(
-     *     path="drivers",
+     *     path="/api/v1/drivers",
      *     summary="Get a paginated list of drivers",
      *     description="Retrieves a paginated list of drivers with optional filtering",
      *     operationId="getDriversList",
@@ -182,7 +182,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Post(
-     *     path="drivers",
+     *     path="/api/v1/drivers",
      *     summary="Create a new driver",
      *     description="Creates a new driver with the provided information",
      *     operationId="createDriver",
@@ -257,7 +257,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Put(
-     *     path="drivers/{id}",
+     *     path="/api/v1/drivers/{id}",
      *     summary="Update a driver",
      *     description="Updates an existing driver's information by ID",
      *     operationId="updateDriver",
@@ -345,7 +345,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="drivers/{id}",
+     *     path="/api/v1/drivers/{id}",
      *     summary="Delete a driver",
      *     description="Deletes a driver by ID (soft delete)",
      *     operationId="deleteDriver",

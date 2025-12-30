@@ -16,7 +16,7 @@ class StudentParentController extends Controller
 
     /**
      * @OA\Get(
-     *     path="student-parents/{id}",
+     *     path="/api/v1/student-parents/{id}",
      *     summary="Get student parent by ID",
      *     description="Retrieves detailed information about a student parent by their ID",
      *     operationId="getStudentParentById",
@@ -59,7 +59,7 @@ class StudentParentController extends Controller
 
     /**
      * @OA\Get(
-     *     path="student-parents",
+     *     path="/api/v1/student-parents",
      *     summary="Get a paginated list of student parents",
      *     description="Retrieves a paginated list of student parents with optional filtering",
      *     operationId="getStudentParentsList",
@@ -127,7 +127,7 @@ class StudentParentController extends Controller
 
     /**
      * @OA\Post(
-     *     path="student-parents",
+     *     path="/api/v1/student-parents",
      *     summary="Create a new student parent",
      *     description="Creates a new student parent with the provided information",
      *     operationId="createStudentParent",
@@ -184,7 +184,7 @@ class StudentParentController extends Controller
 
     /**
      * @OA\Put(
-     *     path="student-parents/{id}",
+     *     path="/api/v1/student-parents/{id}",
      *     summary="Update a student parent",
      *     description="Updates an existing student parent's information by ID",
      *     operationId="updateStudentParent",
@@ -252,7 +252,7 @@ class StudentParentController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="student-parents/{id}",
+     *     path="/api/v1/student-parents/{id}",
      *     summary="Delete a student parent",
      *     description="Deletes a student parent by ID (soft delete)",
      *     operationId="deleteStudentParent",

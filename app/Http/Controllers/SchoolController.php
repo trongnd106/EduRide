@@ -16,7 +16,7 @@ class SchoolController extends Controller
 
     /**
      * @OA\Get(
-     *     path="schools/{id}",
+     *     path="/api/v1/schools/{id}",
      *     summary="Get school by ID",
      *     description="Retrieves detailed information about a school by their ID",
      *     operationId="getSchoolById",
@@ -61,7 +61,7 @@ class SchoolController extends Controller
 
     /**
      * @OA\Get(
-     *     path="schools",
+     *     path="/api/v1/schools",
      *     summary="Get a paginated list of schools",
      *     description="Retrieves a paginated list of schools with optional filtering",
      *     operationId="getSchoolsList",
@@ -146,7 +146,7 @@ class SchoolController extends Controller
 
     /**
      * @OA\Post(
-     *     path="schools",
+     *     path="/api/v1/schools",
      *     summary="Create a new school",
      *     description="Creates a new school with the provided information",
      *     operationId="createSchool",
@@ -209,7 +209,7 @@ class SchoolController extends Controller
 
     /**
      * @OA\Put(
-     *     path="schools/{id}",
+     *     path="/api/v1/schools/{id}",
      *     summary="Update a school",
      *     description="Updates an existing school's information by ID",
      *     operationId="updateSchool",
@@ -283,7 +283,7 @@ class SchoolController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="schools/{id}",
+     *     path="/api/v1/schools/{id}",
      *     summary="Delete a school",
      *     description="Deletes a school by ID (soft delete)",
      *     operationId="deleteSchool",

@@ -16,7 +16,7 @@ class StudentController extends Controller
 
     /**
      * @OA\Get(
-     *     path="students/{id}",
+     *     path="/api/v1/students/{id}",
      *     summary="Get student by ID",
      *     description="Retrieves detailed information about a student by their ID",
      *     operationId="getStudentById",
@@ -68,7 +68,7 @@ class StudentController extends Controller
 
     /**
      * @OA\Get(
-     *     path="students",
+     *     path="/api/v1/students",
      *     summary="Get a paginated list of students",
      *     description="Retrieves a paginated list of students with optional filtering",
      *     operationId="getStudentsList",
@@ -208,7 +208,7 @@ class StudentController extends Controller
 
     /**
      * @OA\Post(
-     *     path="students",
+     *     path="/api/v1/students",
      *     summary="Create a new student",
      *     description="Creates a new student with the provided information",
      *     operationId="createStudent",
@@ -282,7 +282,7 @@ class StudentController extends Controller
 
     /**
      * @OA\Put(
-     *     path="students/{id}",
+     *     path="/api/v1/students/{id}",
      *     summary="Update a student",
      *     description="Updates an existing student's information by ID",
      *     operationId="updateStudent",
@@ -367,7 +367,7 @@ class StudentController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="students/{id}",
+     *     path="/api/v1/students/{id}",
      *     summary="Delete a student",
      *     description="Deletes a student by ID (soft delete)",
      *     operationId="deleteStudent",
