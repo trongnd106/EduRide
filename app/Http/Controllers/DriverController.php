@@ -387,7 +387,7 @@ class DriverController extends Controller
     {
         $id = intval($id);
         return DB::transaction(function () use ($id) {
-            return $this->service->destroy($id);
+            return $this->respond($this->service->destroy($id));
         });
     }
 }
