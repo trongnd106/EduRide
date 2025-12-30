@@ -15,7 +15,7 @@ class StudentParent extends Model
      *
      * @var string
      */
-    protected $table = 'parents';
+    protected $table = 'student_parents';
 
     /**
      * The attributes that are mass assignable.
