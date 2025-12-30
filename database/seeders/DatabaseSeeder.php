@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
 
         // Run seeders
         $this->call([
+            UserSeeder::class,
             SchoolSeeder::class,
             StudentSeeder::class,
             DriverSeeder::class,
