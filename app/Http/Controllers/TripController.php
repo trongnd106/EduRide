@@ -17,7 +17,7 @@ class TripController extends Controller
 
     /**
      * @OA\Post(
-     *     path="trips",
+     *     path="/api/v1/trips",
      *     summary="Create a new trip",
      *     description="Creates a new trip (route) with the provided information",
      *     operationId="createTrip",
@@ -90,7 +90,7 @@ class TripController extends Controller
 
     /**
      * @OA\Post(
-     *     path="trips/{id}/assign-students",
+     *     path="/api/v1/trips/{id}/assign-students",
      *     summary="Assign students to a trip",
      *     description="Assigns a list of students to a trip. Removes existing assignments.",
      *     operationId="assignStudentsToTrip",
@@ -177,7 +177,7 @@ class TripController extends Controller
 
     /**
      * @OA\Get(
-     *     path="trips/{id}/points",
+     *     path="/api/v1/trips/{id}/points",
      *     summary="Get all points of a trip",
      *     description="Retrieves all points (điểm dừng) of a specific trip, ordered by sequence",
      *     operationId="getTripPoints",
@@ -222,7 +222,7 @@ class TripController extends Controller
 
     /**
      * @OA\Get(
-     *     path="trips/{id}/students",
+     *     path="/api/v1/trips/{id}/students",
      *     summary="Get all students of a trip",
      *     description="Retrieves all students assigned to a specific trip",
      *     operationId="getTripStudents",
@@ -266,7 +266,7 @@ class TripController extends Controller
 
     /**
      * @OA\Get(
-     *     path="trips/{trip_id}/points/{point_id}/students",
+     *     path="/api/v1/trips/{trip_id}/points/{point_id}/students",
      *     summary="Get students pickup/dropoff at a specific point",
      *     description="Retrieves students who get on/off at a specific point of a trip",
      *     operationId="getPointStudents",

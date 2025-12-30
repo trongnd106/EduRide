@@ -16,7 +16,7 @@ class VehicleController extends Controller
 
     /**
      * @OA\Get(
-     *     path="vehicles/{id}",
+     *     path="/api/v1/vehicles/{id}",
      *     summary="Get vehicle by ID",
      *     description="Retrieves detailed information about a vehicle by their ID",
      *     operationId="getVehicleById",
@@ -64,7 +64,7 @@ class VehicleController extends Controller
 
     /**
      * @OA\Get(
-     *     path="vehicles",
+     *     path="/api/v1/vehicles",
      *     summary="Get a paginated list of vehicles",
      *     description="Retrieves a paginated list of vehicles with optional filtering",
      *     operationId="getVehiclesList",
@@ -165,7 +165,7 @@ class VehicleController extends Controller
 
     /**
      * @OA\Post(
-     *     path="vehicles",
+     *     path="/api/v1/vehicles",
      *     summary="Create a new vehicle",
      *     description="Creates a new vehicle with the provided information",
      *     operationId="createVehicle",
@@ -232,7 +232,7 @@ class VehicleController extends Controller
 
     /**
      * @OA\Put(
-     *     path="vehicles/{id}",
+     *     path="/api/v1/vehicles/{id}",
      *     summary="Update a vehicle",
      *     description="Updates an existing vehicle's information by ID",
      *     operationId="updateVehicle",
@@ -310,7 +310,7 @@ class VehicleController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="vehicles/{id}",
+     *     path="/api/v1/vehicles/{id}",
      *     summary="Delete a vehicle",
      *     description="Deletes a vehicle by ID (soft delete)",
      *     operationId="deleteVehicle",
