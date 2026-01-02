@@ -61,7 +61,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="api/v1/logout",
+     *     path="/api/v1/logout",
      *     summary="User logout",
      *     tags={"Authentication"},
      *     @OA\RequestBody(
