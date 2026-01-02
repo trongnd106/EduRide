@@ -31,8 +31,8 @@ done
 echo "✅ MySQL is ready!"
 
 # Chạy migrations (nếu cần)
-echo "📊 Running migrations..."
-docker exec hust_prod_php php artisan migrate --force
+#echo "📊 Running migrations..."
+#docker exec hust_prod_php php artisan migrate --force
 
 # Clear và cache config
 echo "🔄 Clearing cache..."
