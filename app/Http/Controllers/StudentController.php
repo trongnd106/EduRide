@@ -43,6 +43,7 @@ class StudentController extends Controller
      *             @OA\Property(property="grade", type="integer", example=4),
      *             @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=0),
      *             @OA\Property(property="address", type="string", example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *             @OA\Property(property="image_url", type="string", example="https://example.com/image.jpg"),
      *             @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511, description="Vĩ độ GPS"),
      *             @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817, description="Kinh độ GPS"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-06T18:53:35.000000Z"),
