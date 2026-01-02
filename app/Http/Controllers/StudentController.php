@@ -158,6 +158,7 @@ class StudentController extends Controller
      *             @OA\Property(property="data", type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=73),
      *                     @OA\Property(property="student_number", type="string", example="SV515126"),
      *                     @OA\Property(property="email", type="string", format="email", example="rchamplin@example.net"),
      *                     @OA\Property(property="full_name", type="string", example="Kulas Alyce"),
@@ -188,6 +189,7 @@ class StudentController extends Controller
     public function index(Request $request): Response
     {
         $column = [
+            'id',
             'student_number',
             'email',
             'full_name',
