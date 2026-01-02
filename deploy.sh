@@ -42,7 +42,7 @@ docker exec hust_prod_php php artisan view:cache
 
 # Cleanup unused images
 echo "🧹 Cleaning up old images..."
-docker image prune -f
+# docker image prune -f
 
 echo "✨ Deploy hoàn tất!"
 echo "📌 Kiểm tra status: docker-compose -f docker-compose.prod.yml ps"
