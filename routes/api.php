@@ -41,7 +41,8 @@ Route::apiResource('trips', TripController::class);
 
 // Custom routes for trips
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
-    Route::post('/', [TripController::class, 'create'])->name('create');
+    Route::post('/', [TripController::class, 'store'])->name('store');
+    Route::get('/', [TripController::class, 'index'])->name('index');
     Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
     Route::get('{id}/points', [TripController::class, 'getPoints'])->name('points');
     Route::get('{id}/students', [TripController::class, 'getStudents'])->name('students');
