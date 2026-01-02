@@ -31,6 +31,7 @@ class Student extends Authenticatable
         'address',
         'latitude',
         'longitude',
+        'image_url',
         'status',
     ];
 
