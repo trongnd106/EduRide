@@ -52,7 +52,7 @@ class AuthService
             if (isset($client['provider']) && isset($configProviders[$client['provider']])) {
                 $model = $configProviders[$client['provider']]['model'];
                 $this->oClient[$model] = $client;
-                $this->guards[$model] = $providerGuardMaps[$client['provider']];
+                $this->guards[$model] = $providerGuardMaps[$client['provider']] ?? null;
             }
         }
     }
@@ -93,11 +93,15 @@ class AuthService
         if (!$result['token']) {
             throw new AuthorizationException(__('api.exception.invalid_credentials'));
         }
-        $guard = auth($this->_getGuard($modelNamespace));
-        if ($guard && $guard->attempt(compact('email', 'password'))) {
-            $user = $guard->user();
-            $user->last_login = now();
-            $user->save();
+        
+        // Get user from email after token is successfully generated
+        // Token generation already validates credentials, so we can safely get user
+        $user = $modelNamespace::where('email', $email)
+            ->where('status', AppConst::STATUS_ACTIVE)
+            ->with('roles') // Load roles relationship
+            ->first();
+        
+        if ($user) {
             $result['user'] = $user;
         }
 
@@ -131,7 +135,14 @@ class AuthService
     public function generateToken(string $modelNamespace, $email, $password)
     {
         $oClient = $this->_getClient($modelNamespace);
-        if (!$oClient) return null;
+        if (!$oClient) {
+            \Log::error('OAuth client not found for model', [
+                'model' => $modelNamespace,
+                'available_clients' => array_keys($this->oClient ?? []),
+                'hint' => 'Run: php artisan passport:client --password --provider users --name users'
+            ]);
+            return null;
+        }
 
         $request = Request::create('/oauth/token', 'POST', [
             'grant_type' => 'password',

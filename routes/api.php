@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\StudentParentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,9 @@ use App\Http\Controllers\TripController;
 Route::get('/', function () {
     return response()->json(['status' => 'OK', 'message' => 'API is working!']);
 });
+
+Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route::group(['prefix' => 'students', 'as' => 'student'], function () {
 //     Route::get('/{id}', [StudentController::class, 'show'])->name('show');

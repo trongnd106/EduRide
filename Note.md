@@ -12,3 +12,8 @@ ssh -i ~/.ssh/id_rsa ubuntu@34.61.124.56
 ### 3. Route cơ bản:
 - DB: 8001 : http://34.61.124.56:8001 - U/P: hust_user/123456
 - Swagger: http://34.61.124.56/api/documentation
+
+### 4. Tạo OAuth client cho provider users:
+```
+php artisan passport:client --password --provider users --name users
+```
