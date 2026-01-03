@@ -204,7 +204,8 @@ class StudentController extends Controller
             'longitude',
             'status'
         ];
-        $result = $this->service->paginate($request->all(), [], $column);
+        $relations = ["parent:id,full_name,phone_number"];
+        $result = $this->service->paginate($request->all(), $relations, $column);
         return $this->respond($result);
     }
 

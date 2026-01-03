@@ -121,7 +121,8 @@ class StudentParentController extends Controller
      */
     public function index(Request $request): Response
     {
-        $result = $this->service->paginate($request->all());
+        $relations = ["students:id,full_name,grade"];
+        $result = $this->service->paginate($request->all(),$relations);
         return $this->respond($result);
     }
 
