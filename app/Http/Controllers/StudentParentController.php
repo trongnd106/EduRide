@@ -103,7 +103,20 @@ class StudentParentController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="user_id", type="integer", nullable=true, example=1),
      *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
-     *                     @OA\Property(property="phone_number", type="string", example="0987654321")
+     *                     @OA\Property(property="phone_number", type="string", example="0987654321"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z"),
+     *                     @OA\Property(
+     *                         property="students",
+     *                         type="array",
+     *                         description="Danh sách học sinh của phụ huynh",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
+     *                             @OA\Property(property="grade", type="integer", example=4)
+     *                         )
+     *                     )
      *                 )
      *             ),
      *             @OA\Property(property="total", type="integer", example=50, description="Total number of records"),

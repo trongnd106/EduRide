@@ -160,18 +160,27 @@ class StudentController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=73),
-     *                     @OA\Property(property="student_number", type="string", example="SV515126"),
-     *                     @OA\Property(property="email", type="string", format="email", example="rchamplin@example.net"),
-     *                     @OA\Property(property="full_name", type="string", example="Kulas Alyce"),
-     *                     @OA\Property(property="phone", type="string", example="0512260082"),
-     *                     @OA\Property(property="gender", type="integer", description="1 = Nam, 0 = Nữ", example=0),
-     *                     @OA\Property(property="dob", type="string", format="date", example="2003-09-20"),
-     *                     @OA\Property(property="grade", type="integer", example=12),
-     *                     @OA\Property(property="address", type="string", example="921 Burnice Squares\nLake Clyde, LA 55839"),
+     *                     @OA\Property(property="student_number", type="string", example="20225105"),
+     *                     @OA\Property(property="email", type="string", format="email", nullable=true, example="nam.nguyen225105@sis.hust.edu.vn"),
+     *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
+     *                     @OA\Property(property="phone", type="string", nullable=true, example="0987654321"),
+     *                     @OA\Property(property="gender", type="integer", description="1 = Nam, 0 = Nữ", example=1),
+     *                     @OA\Property(property="dob", type="string", format="date", nullable=true, example="2004-05-15"),
+     *                     @OA\Property(property="grade", type="integer", nullable=true, example=4),
+     *                     @OA\Property(property="address", type="string", nullable=true, example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
      *                     @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
-     *                     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511),
-     *                     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817),
-     *                     @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=1)
+     *                     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511, description="Vĩ độ GPS"),
+     *                     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817, description="Kinh độ GPS"),
+     *                     @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=0),
+     *                     @OA\Property(
+     *                         property="parent",
+     *                         type="object",
+     *                         nullable=true,
+     *                         description="Thông tin phụ huynh",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                         @OA\Property(property="phone_number", type="string", example="0987654321")
+     *                     )
      *                 )
      *             ),
      *             @OA\Property(property="total", type="integer", example=72, description="Total number of records"),
