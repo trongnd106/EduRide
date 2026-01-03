@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\StudentParentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\PointController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -42,6 +43,7 @@ Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('student-parents', StudentParentController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('trips', TripController::class);
+Route::apiResource('points', PointController::class);
 
 // Custom routes for trips
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
