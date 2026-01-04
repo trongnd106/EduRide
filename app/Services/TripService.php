@@ -171,30 +171,25 @@ class TripService extends BaseService
      */
     public function assignPointStudents(int $tripId, array $pointsData): Trip
     {
-        // Lấy trip
         $trip = $this->show($tripId);
 
-        // Lấy danh sách point_id từ request
         $pointIds = array_column($pointsData, 'point_id');
         if (empty($pointIds)) {
-            // Reload relationships và return nếu không có điểm nào
+            // Reload relationships and return
             $trip->load(['pointStudents.student', 'pointStudents.point', 'points']);
             return $trip;
         }
 
-        // 1. Lưu các trip_id, point_id vào bảng trip_points
         $tripPoints = [];
         $now = now();
         $order = 1;
 
         foreach ($pointIds as $pointId) {
-            // Kiểm tra xem trip_point đã tồn tại chưa (do unique constraint)
             $existingTripPoint = \App\Models\TripPoint::where('trip_id', $tripId)
                 ->where('point_id', $pointId)
                 ->first();
 
             if (!$existingTripPoint) {
-                // Tạo mới trip_point nếu chưa tồn tại
                 $tripPoints[] = [
                     'id' => (string) \Illuminate\Support\Str::uuid(),
                     'trip_id' => $trip->id,
@@ -206,17 +201,17 @@ class TripService extends BaseService
             }
         }
 
-        // Bulk insert trip_points nếu có
+        // Bulk insert trip_points
         if (!empty($tripPoints)) {
             \App\Models\TripPoint::insert($tripPoints);
         }
 
-        // 2. Xóa các assignments cũ cho các điểm được chỉ định trong point_students
+        // Delete old assignments for selected points in point_students
         \App\Models\PointStudent::where('trip_id', $tripId)
             ->whereIn('point_id', $pointIds)
             ->delete();
 
-        // 3. Lưu các point_id, student_id vào bảng point_students
+        // Save point_id, student_id into point_students
         $pointStudents = [];
         foreach ($pointsData as $pointData) {
             $pointId = $pointData['point_id'];
@@ -228,16 +223,16 @@ class TripService extends BaseService
                     'trip_id' => $trip->id,
                     'point_id' => $pointId,
                     'student_id' => $studentId,
-                    'type' => 0, // Mặc định là Lên xe (có thể điều chỉnh sau)
-                    'status' => 0, // Chưa điểm danh
-                    'method' => 0, // Mặc định là Thủ công
+                    'type' => 0,  // len xe
+                    'status' => 0,  // chua diem danh
+                    'method' => 0,  // thu cong
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
             }
         }
 
-        // Bulk insert point_students nếu có
+        // Bulk insert point_students
         if (!empty($pointStudents)) {
             \App\Models\PointStudent::insert($pointStudents);
         }
