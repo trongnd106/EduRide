@@ -136,6 +136,72 @@ class PointController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/points/all",
+     *     summary="Get all points without pagination",
+     *     description="Retrieves a complete list of all points without pagination, with optional filtering",
+     *     operationId="getAllPoints",
+     *     tags={"Points"},
+     *     @OA\Parameter(
+     *         name="address__like",
+     *         in="query",
+     *         description="Filter by address (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Đường Láng")
+     *     ),
+     *     @OA\Parameter(
+     *         name="latitude__equal",
+     *         in="query",
+     *         description="Filter by latitude (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", example=21.028511)
+     *     ),
+     *     @OA\Parameter(
+     *         name="longitude__equal",
+     *         in="query",
+     *         description="Filter by longitude (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", example=105.804817)
+     *     ),
+     *     @OA\Parameter(
+     *         name="type__equal",
+     *         in="query",
+     *         description="Filter by type (0 = Điểm phụ, 1 = Điểm dừng)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=0)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="address", type="string", nullable=true, example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *                     @OA\Property(property="latitude", type="number", format="float", example=21.028511, description="Vĩ độ GPS"),
+     *                     @OA\Property(property="longitude", type="number", format="float", example=105.804817, description="Kinh độ GPS"),
+     *                     @OA\Property(property="type", type="integer", example=0, description="0 = Điểm phụ, 1 = Điểm dừng"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function all(Request $request): Response
+    {
+        $result = $this->service->paginate($request->all(), [], [], false);
+        return $this->respond(['data' => $result]);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/points",
      *     summary="Create a new point",

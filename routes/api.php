@@ -44,6 +44,7 @@ Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('student-parents', StudentParentController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('trips', TripController::class);
+Route::get('points/all', [PointController::class, 'all'])->name('points.all');
 Route::apiResource('points', PointController::class);
 
 // Custom routes for trips
