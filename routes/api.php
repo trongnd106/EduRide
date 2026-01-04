@@ -36,6 +36,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 //     Route::put('/{id}', [StudentController::class, 'update'])->name('update');
 //     Route::delete('/{id}', [StudentController::class, 'destroy'])->name('destroy');
 // });
+Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
 Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
 Route::apiResource('drivers', DriverController::class);
