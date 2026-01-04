@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignStudentsRequest;
+use App\Http\Requests\AssignTripPointStudentsRequest;
 use App\Http\Requests\CreateTripRequest;
 use App\Services\TripService;
 use Illuminate\Http\Request;
@@ -173,6 +174,130 @@ class TripController extends Controller
         return DB::transaction(function () use ($request, $tripId) {
             $studentIds = $request->validated()['student_ids'];
             return $this->service->assignStudents($tripId, $studentIds);
+        }, 3);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/trips/{id}/assign-point-students",
+     *     summary="Assign students to multiple points in a trip",
+     *     description="Assigns students to multiple points (điểm dừng) in a specific trip. Each point can have multiple students assigned.",
+     *     operationId="assignTripPointStudents",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"points"},
+     *             @OA\Property(
+     *                 property="points",
+     *                 type="array",
+     *                 description="Danh sách các điểm và học sinh được gán",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"id", "students"},
+     *                     @OA\Property(property="id", type="integer", example=1, description="ID của điểm dừng"),
+     *                     @OA\Property(
+     *                         property="students",
+     *                         type="array",
+     *                         description="Danh sách ID học sinh được gán cho điểm này",
+     *                         @OA\Items(type="integer", example=1)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Students assigned to points successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Lộ trình đón buổi sáng"),
+     *             @OA\Property(property="driver_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="assistant_id", type="integer", nullable=true, example=2),
+     *             @OA\Property(property="vehicle_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="total_students", type="integer", example=15),
+     *             @OA\Property(property="curr_students", type="integer", example=0),
+     *             @OA\Property(property="type", type="integer", example=0, description="0 = Đón, 1 = Trả"),
+     *             @OA\Property(property="status", type="integer", example=0, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
+     *             @OA\Property(
+     *                 property="point_students",
+     *                 type="array",
+     *                 description="Danh sách học sinh được gán cho các điểm",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="uuid-string"),
+     *                     @OA\Property(property="trip_id", type="integer", example=1),
+     *                     @OA\Property(property="point_id", type="integer", example=1),
+     *                     @OA\Property(property="student_id", type="integer", example=1),
+     *                     @OA\Property(property="type", type="integer", example=0, description="0 = Lên xe, 1 = Xuống xe"),
+     *                     @OA\Property(property="status", type="integer", example=0, description="0 = Chưa điểm danh, 1 = Đã điểm danh"),
+     *                     @OA\Property(
+     *                         property="student",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="full_name", type="string", example="Nguyễn Văn A"),
+     *                         @OA\Property(property="grade", type="integer", example=4)
+     *                     ),
+     *                     @OA\Property(
+     *                         property="point",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="address", type="string", example="123 Đường Láng, Hà Nội")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="points", type="array",
+     *                     @OA\Items(type="string", example="Danh sách điểm là bắt buộc")
+     *                 ),
+     *                 @OA\Property(property="points.0.id", type="array",
+     *                     @OA\Items(type="string", example="ID điểm là bắt buộc")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function assignPointStudents(AssignTripPointStudentsRequest $request, $id): Response
+    {
+        $tripId = intval($id);
+        return DB::transaction(function () use ($request, $tripId) {
+            $points = $request->validated()['points'];
+            
+            // Convert format from {id, students} to {point_id, student_ids} for service method
+            $pointsData = array_map(function ($point) {
+                return [
+                    'point_id' => $point['id'],
+                    'student_ids' => $point['students'],
+                ];
+            }, $points);
+            
+            return $this->respond($this->service->assignPointStudents($tripId, $pointsData));
         }, 3);
     }
 
