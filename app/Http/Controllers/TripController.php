@@ -288,7 +288,7 @@ class TripController extends Controller
         $tripId = intval($id);
         return DB::transaction(function () use ($request, $tripId) {
             $points = $request->validated()['points'];
-            
+
             // Convert format from {id, students} to {point_id, student_ids} for service method
             $pointsData = array_map(function ($point) {
                 return [
@@ -296,7 +296,7 @@ class TripController extends Controller
                     'student_ids' => $point['students'],
                 ];
             }, $points);
-            
+
             return $this->respond($this->service->assignPointStudents($tripId, $pointsData));
         }, 3);
     }
@@ -325,7 +325,9 @@ class TripController extends Controller
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội", description="Địa chỉ điểm dừng"),
      *                 @OA\Property(property="type", type="integer", example=1, description="0 = Điểm phụ, 1 = Điểm dừng"),
-     *                 @OA\Property(property="order", type="integer", example=1, description="Thứ tự điểm trong lộ trình")
+     *                 @OA\Property(property="order", type="integer", example=1, description="Thứ tự điểm trong lộ trình"),
+     *                 @OA\Property(property="latitude", type="number", format="float", example=21.028511, description="Vĩ độ GPS"),
+     *                 @OA\Property(property="longitude", type="number", format="float", example=105.804817, description="Kinh độ GPS")
      *             )
      *         )
      *     ),
