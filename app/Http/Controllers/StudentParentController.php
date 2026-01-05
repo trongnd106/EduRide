@@ -140,6 +140,76 @@ class StudentParentController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/student-parents/all",
+     *     summary="Get all student parents without pagination",
+     *     description="Retrieves a complete list of all student parents without pagination, with optional filtering. Includes students relation.",
+     *     operationId="getAllStudentParents",
+     *     tags={"Student Parents"},
+     *     @OA\Parameter(
+     *         name="full_name__like",
+     *         in="query",
+     *         description="Filter by full name (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Nguyễn")
+     *     ),
+     *     @OA\Parameter(
+     *         name="phone_number__like",
+     *         in="query",
+     *         description="Filter by phone number (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="0987")
+     *     ),
+     *     @OA\Parameter(
+     *         name="phone_number__equal",
+     *         in="query",
+     *         description="Filter by phone number (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="0987654321")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="user_id", type="integer", nullable=true, example=1, description="ID người dùng"),
+     *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                     @OA\Property(property="phone_number", type="string", example="0987654321"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-25T10:30:00.000000Z"),
+     *                     @OA\Property(
+     *                         property="students",
+     *                         type="array",
+     *                         description="Danh sách học sinh của phụ huynh",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
+     *                             @OA\Property(property="grade", type="integer", example=4)
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function all(Request $request): Response
+    {
+        $relations = ["students:id,full_name,grade"];
+        $result = $this->service->paginate($request->all(),$relations, [], false);
+        return $this->respond(['data' => $result]);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/student-parents",
      *     summary="Create a new student parent",

@@ -40,7 +40,9 @@ Route::get('students/all', [StudentController::class, 'all'])->name('students.al
 Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
 Route::apiResource('drivers', DriverController::class);
+Route::get('vehicles/all', [VehicleController::class, 'all'])->name('vehicles.all');
 Route::apiResource('vehicles', VehicleController::class);
+Route::get('student-parents/all', [StudentParentController::class, 'all'])->name('student-parents.all');
 Route::apiResource('student-parents', StudentParentController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('trips', TripController::class);

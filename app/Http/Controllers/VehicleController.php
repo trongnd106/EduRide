@@ -164,6 +164,97 @@ class VehicleController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/vehicles/all",
+     *     summary="Get all vehicles without pagination",
+     *     description="Retrieves a complete list of all vehicles without pagination, with optional filtering",
+     *     operationId="getAllVehicles",
+     *     tags={"Vehicles"},
+     *     @OA\Parameter(
+     *         name="plate_number__like",
+     *         in="query",
+     *         description="Filter by plate number (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="30A")
+     *     ),
+     *     @OA\Parameter(
+     *         name="plate_number__equal",
+     *         in="query",
+     *         description="Filter by plate number (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="30A-12345")
+     *     ),
+     *     @OA\Parameter(
+     *         name="capacity__equal",
+     *         in="query",
+     *         description="Filter by capacity (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=16)
+     *     ),
+     *     @OA\Parameter(
+     *         name="year__equal",
+     *         in="query",
+     *         description="Filter by year (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=2020)
+     *     ),
+     *     @OA\Parameter(
+     *         name="brand__like",
+     *         in="query",
+     *         description="Filter by brand (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Ford")
+     *     ),
+     *     @OA\Parameter(
+     *         name="type__equal",
+     *         in="query",
+     *         description="Filter by type (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="status__equal",
+     *         in="query",
+     *         description="Filter by status (0 = Không hoạt động, 1 = Đang hoạt động)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="type", type="integer", example=1, description="Loại xe"),
+     *                     @OA\Property(property="plate_number", type="string", example="30A-12345"),
+     *                     @OA\Property(property="capacity", type="integer", example=16),
+     *                     @OA\Property(property="year", type="integer", example=2020),
+     *                     @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *                     @OA\Property(property="model", type="string", example="Transit 350"),
+     *                     @OA\Property(property="color", type="string", example="Trắng"),
+     *                     @OA\Property(property="status", type="integer", description="0 = Không hoạt động, 1 = Đang hoạt động", example=1),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-07T22:48:57.000000Z")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function all(Request $request): Response
+    {
+        $result = $this->service->paginate($request->all(), [], [], false);
+        return $this->respond(['data' => $result]);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/vehicles",
      *     summary="Create a new vehicle",
