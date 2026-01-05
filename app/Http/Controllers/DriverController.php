@@ -181,6 +181,74 @@ class DriverController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/drivers/all",
+     *     summary="Get all drivers without pagination",
+     *     description="Retrieves a complete list of all drivers without pagination, with optional filtering",
+     *     operationId="getAllDrivers",
+     *     tags={"Drivers"},
+     *     @OA\Parameter(
+     *         name="full_name__like",
+     *         in="query",
+     *         description="Filter by full name (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Nguyễn")
+     *     ),
+     *     @OA\Parameter(
+     *         name="status__equal",
+     *         in="query",
+     *         description="Filter by status (0 = Không hoạt động, 1 = Đang hoạt động)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="position__equal",
+     *         in="query",
+     *         description="Filter by position (1 = Tài xế, 2 = Phụ xe)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="user_id", type="integer", nullable=true, example=1, description="ID người dùng"),
+     *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn A"),
+     *                     @OA\Property(property="cccd", type="string", nullable=true, example="001234567890"),
+     *                     @OA\Property(property="phone", type="string", example="0987654321"),
+     *                     @OA\Property(property="email", type="string", format="email", nullable=true, example="nguyenvanan@example.com"),
+     *                     @OA\Property(property="gender", type="integer", nullable=true, description="1 = Nam, 0 = Nữ", example=1),
+     *                     @OA\Property(property="license_number", type="string", nullable=true, example="A1234567"),
+     *                     @OA\Property(property="age", type="integer", nullable=true, example=39),
+     *                     @OA\Property(property="address", type="string", nullable=true, example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *                     @OA\Property(property="image_url", type="string", nullable=true, example="https://example.com/images/drivers/1.jpg"),
+     *                     @OA\Property(property="school_id", type="integer", nullable=true, example=1),
+     *                     @OA\Property(property="status", type="integer", description="0 = Không hoạt động, 1 = Đang hoạt động", example=1),
+     *                     @OA\Property(property="position", type="integer", description="1 = Tài xế, 2 = Phụ xe", example=1),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-07T22:48:42.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-07T22:48:42.000000Z")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function all(Request $request): Response
+    {
+        $result = $this->service->paginate($request->all(), [], [],false);
+        return $this->respond(['data' => $result]);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/drivers",
      *     summary="Create a new driver",

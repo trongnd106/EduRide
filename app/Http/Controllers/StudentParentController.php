@@ -160,13 +160,6 @@ class StudentParentController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", example="0987")
      *     ),
-     *     @OA\Parameter(
-     *         name="phone_number__equal",
-     *         in="query",
-     *         description="Filter by phone number (exact match)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="0987654321")
-     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",

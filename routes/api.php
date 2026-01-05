@@ -39,6 +39,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
 Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
+Route::get('drivers/all', [DriverController::class, 'all'])->name('drivers.all');
 Route::apiResource('drivers', DriverController::class);
 Route::get('vehicles/all', [VehicleController::class, 'all'])->name('vehicles.all');
 Route::apiResource('vehicles', VehicleController::class);
