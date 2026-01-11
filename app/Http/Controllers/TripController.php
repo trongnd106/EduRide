@@ -605,6 +605,84 @@ class TripController extends Controller
 
     /**
      * @OA\Get(
+     *     path="/api/v1/trips/{id}",
+     *     summary="Get trip by ID",
+     *     description="Retrieves detailed information about a trip by its ID, including driver, assistant, and vehicle information",
+     *     operationId="getTripById",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", nullable=true, example="Lộ trình đón buổi sáng"),
+     *             @OA\Property(property="driver_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(
+     *                 property="driver",
+     *                 type="object",
+     *                 nullable=true,
+     *                 description="Thông tin tài xế",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="full_name", type="string", example="Nguyễn Văn A")
+     *             ),
+     *             @OA\Property(property="assistant_id", type="integer", nullable=true, example=2),
+     *             @OA\Property(
+     *                 property="assistant",
+     *                 type="object",
+     *                 nullable=true,
+     *                 description="Thông tin phụ xe",
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="full_name", type="string", example="Trần Thị Bình")
+     *             ),
+     *             @OA\Property(property="vehicle_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(
+     *                 property="vehicle",
+     *                 type="object",
+     *                 nullable=true,
+     *                 description="Thông tin phương tiện",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="plate_number", type="string", example="30A-12345")
+     *             ),
+     *             @OA\Property(property="total_students", type="integer", example=25),
+     *             @OA\Property(property="curr_students", type="integer", example=20),
+     *             @OA\Property(property="type", type="integer", example=0, description="0 = Đón, 1 = Trả"),
+     *             @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
+     *             @OA\Property(property="start_time", type="string", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
+     *             @OA\Property(property="end_time", type="string", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Trip not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function show($id): Response
+    {
+        $relation = ["driver:id,full_name", "assistant:id,full_name", "vehicle:id,plate_number"];
+        return $this->respond($this->service->show($id, $relation));
+    }
+
+    /**
+     * @OA\Get(
      *     path="/api/v1/trips/user-trips",
      *     summary="Get trips for authenticated user",
      *     description="Retrieves all trips for the authenticated user based on their role. For assistants (phụ xe), returns trips where they are assigned as assistant. For parents (phụ huynh), returns trips where their children are participating. Returns empty array if user has no role or no trips.",
