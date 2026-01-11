@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\Role;
 use App\Http\Requests\CreateTripRequest;
 use App\Models\Trip;
 use App\Models\TripStudent;
@@ -241,6 +242,83 @@ class TripService extends BaseService
         $trip->load(['pointStudents.student', 'pointStudents.point', 'points']);
 
         return $trip;
+    }
+
+    /**
+     * Get trips for the authenticated user based on their role.
+     *
+     * @return array List of trips (without students and points details)
+     */
+    public function getUserTrip(): array
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return [];
+        }
+
+        $trips = collect();
+
+        if ($user->hasRole(Role::ROLE_ASSISTANT)) {
+            $driver = $user->driver;
+            if ($driver) {
+                $trips = Trip::where('assistant_id', $driver->id)
+                    ->with(['driver', 'assistant', 'vehicle'])
+                    ->get();
+            }
+        } elseif ($user->hasRole(Role::ROLE_PARENT)) {
+            $studentParent = $user->studentParent;
+            if ($studentParent) {
+                $studentIds = $studentParent->students()->pluck('id');
+
+                if ($studentIds->isNotEmpty()) {
+                    $tripIds = \App\Models\TripStudent::whereIn('student_id', $studentIds)
+                        ->pluck('trip_id')
+                        ->unique();
+
+                    if ($tripIds->isNotEmpty()) {
+                        $trips = Trip::whereIn('id', $tripIds)
+                            ->with(['driver', 'assistant', 'vehicle'])
+                            ->get();
+                    }
+                }
+            }
+        }
+
+        // Format response
+        return $trips->map(function ($trip) {
+            return [
+                'id' => $trip->id,
+                'name' => $trip->name,
+                'driver_id' => $trip->driver_id,
+                'driver' => $trip->driver ? [
+                    'id' => $trip->driver->id,
+                    'full_name' => $trip->driver->full_name,
+                    'phone' => $trip->driver->phone,
+                ] : null,
+                'assistant_id' => $trip->assistant_id,
+                'assistant' => $trip->assistant ? [
+                    'id' => $trip->assistant->id,
+                    'full_name' => $trip->assistant->full_name,
+                    'phone' => $trip->assistant->phone,
+                ] : null,
+                'vehicle_id' => $trip->vehicle_id,
+                'vehicle' => $trip->vehicle ? [
+                    'id' => $trip->vehicle->id,
+                    'plate_number' => $trip->vehicle->plate_number,
+                    'brand' => $trip->vehicle->brand,
+                    'model' => $trip->vehicle->model,
+                ] : null,
+                'total_students' => $trip->total_students,
+                'curr_students' => $trip->curr_students,
+                'type' => $trip->type,
+                'status' => $trip->status,
+                'start_time' => $trip->start_time,
+                'end_time' => $trip->end_time,
+                'created_at' => $trip->created_at?->toDateTimeString(),
+                'updated_at' => $trip->updated_at?->toDateTimeString(),
+            ];
+        })->toArray();
     }
 }
 
