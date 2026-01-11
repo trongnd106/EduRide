@@ -37,7 +37,6 @@ class PointStudent extends Model
         'point_id',
         'student_id',
         'type',
-        'method',
         'note',
         'image_url',
     ];
@@ -52,7 +51,6 @@ class PointStudent extends Model
         'point_id' => 'integer',
         'student_id' => 'integer',
         'type' => 'integer',
-        'method' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

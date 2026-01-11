@@ -19,6 +19,7 @@ return new class extends Migration
 
         Schema::table('point_students', function (Blueprint $table) {
             $table->dropColumn('status');
+            $table->dropColumn('method');
         });
     }
 
@@ -28,7 +29,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('point_students', function (Blueprint $table) {
-            $table->integer('status')->default(0)->comment('0 = Chưa điểm danh, 1 = Đã điểm danh')->after('type');
+            $table->integer('status')->default(0)->comment('0 = Chưa điểm danh, 1 = Đã điểm danh');
+            $table->integer('method')->comment('0 = Thủ công,1 = QR');
         });
 
         Schema::table('point_students', function (Blueprint $table) {

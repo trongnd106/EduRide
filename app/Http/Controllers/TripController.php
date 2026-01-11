@@ -288,7 +288,7 @@ class TripController extends Controller
         return DB::transaction(function () use ($request, $tripId) {
             $points = $request->validated()['points'];
 
-            // Convert format from {id, students} to {point_id, student_ids} for service method
+            // Convert format from {id, students} to {point_id, student_ids}
             $pointsData = array_map(function ($point) {
                 return [
                     'point_id' => $point['id'],
