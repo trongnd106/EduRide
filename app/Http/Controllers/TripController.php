@@ -833,4 +833,52 @@ class TripController extends Controller
         $trips = $this->service->getUserTrip();
         return $this->respond($trips);
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/trips/{id}",
+     *     summary="Delete a trip",
+     *     description="Deletes a trip by ID. This will also delete related records in trip_points, trip_students, and point_students tables.",
+     *     operationId="deleteTrip",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip to delete",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trip deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="value", type="boolean", example=true, description="Indicates if the deletion was successful")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Trip not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *         )
+     *     )
+     * )
+     */
+    public function destroy($id): Response
+    {
+        $tripId = intval($id);
+        return DB::transaction(function () use ($tripId) {
+            return $this->respond($this->service->destroy($tripId));
+        }, 3);
+    }
 }
