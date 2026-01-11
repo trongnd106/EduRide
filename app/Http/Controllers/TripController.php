@@ -241,6 +241,7 @@ class TripController extends Controller
      *                     @OA\Property(property="point_id", type="integer", example=1),
      *                     @OA\Property(property="student_id", type="integer", example=1),
      *                     @OA\Property(property="type", type="integer", example=0, description="0 = Lên xe, 1 = Xuống xe"),
+     *                     @OA\Property(property="status", type="integer", nullable=true, example=null, description="Không dùng nữa, luôn null"),
      *                     @OA\Property(
      *                         property="student",
      *                         type="object",

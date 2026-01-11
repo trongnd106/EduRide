@@ -33,6 +33,7 @@ class Student extends Authenticatable
         'longitude',
         'image_url',
         'status',
+        'qr_code_image_url',
     ];
 
     /**
