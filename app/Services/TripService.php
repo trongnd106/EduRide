@@ -225,7 +225,6 @@ class TripService extends BaseService
                     'point_id' => $pointId,
                     'student_id' => $studentId,
                     'type' => 0,  // len xe
-                    'status' => 0,  // chua diem danh
                     'method' => 0,  // thu cong
                     'created_at' => $now,
                     'updated_at' => $now,
