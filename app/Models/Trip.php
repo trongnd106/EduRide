@@ -44,8 +44,8 @@ class Trip extends Model
         'curr_students' => 'integer',
         'type' => 'integer',
         'status' => 'integer',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_time' => 'string',
+        'end_time' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

@@ -38,8 +38,8 @@ class CreateTripRequest extends FormRequest
             'curr_students' => ['nullable', 'integer', 'min:0'],
             'type' => ['nullable', 'integer', Rule::in([0, 1])],
             'status' => ['nullable', 'integer', Rule::in([0, 1, 2])],
-            'start_time' => ['nullable', 'date'],
-            'end_time' => ['nullable', 'date', 'after:start_time'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
         ];
     }
 }
