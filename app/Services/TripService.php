@@ -52,7 +52,9 @@ class TripService extends BaseService
                 'id' => (string) \Illuminate\Support\Str::uuid(),
                 'trip_id' => $trip->id,
                 'student_id' => $studentId,
-                'status' => 0, // Chưa điểm danh
+                'status' => -1, // Chưa lên xe
+                'check_in' => 0, // Chưa điểm danh
+                'method' => null, // Chưa có phương pháp điểm danh
                 'created_at' => $now,
                 'updated_at' => $now,
             ];

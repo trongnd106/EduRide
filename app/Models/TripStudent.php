@@ -36,6 +36,8 @@ class TripStudent extends Model
         'trip_id',
         'student_id',
         'status',
+        'check_in',
+        'method',
     ];
 
     /**
@@ -47,6 +49,8 @@ class TripStudent extends Model
         'trip_id' => 'integer',
         'student_id' => 'integer',
         'status' => 'integer',
+        'check_in' => 'integer',
+        'method' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
