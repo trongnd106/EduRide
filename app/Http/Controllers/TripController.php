@@ -682,6 +682,96 @@ class TripController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/v1/trips/{id}",
+     *     summary="Update a trip",
+     *     description="Updates an existing trip's information by ID",
+     *     operationId="updateTrip",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip to update",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="name", type="string", example="Lộ trình đón buổi sáng", description="Tên lộ trình (optional)"),
+     *             @OA\Property(property="driver_id", type="integer", example=1, description="ID tài xế (drivers.position = 1, optional)"),
+     *             @OA\Property(property="assistant_id", type="integer", example=2, description="ID phụ xe (drivers.position = 2, phải khác driver_id, optional)"),
+     *             @OA\Property(property="vehicle_id", type="integer", example=1, description="ID phương tiện (optional)"),
+     *             @OA\Property(property="total_students", type="integer", example=25, description="Tổng số học sinh (optional)"),
+     *             @OA\Property(property="curr_students", type="integer", example=20, description="Số học sinh hiện tại (optional)"),
+     *             @OA\Property(property="type", type="integer", example=0, description="Loại chuyến: 0 = Đón, 1 = Trả (optional)"),
+     *             @OA\Property(property="status", type="integer", example=1, description="Trạng thái: 0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành (optional)"),
+     *             @OA\Property(property="start_time", type="string", example="07:00", description="Thời gian bắt đầu (format: HH:mm, optional)"),
+     *             @OA\Property(property="end_time", type="string", example="08:30", description="Thời gian kết thúc (format: HH:mm, phải sau start_time, optional)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trip updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", nullable=true, example="Lộ trình đón buổi sáng"),
+     *             @OA\Property(property="driver_id", type="integer", nullable=true, example=1, description="ID tài xế"),
+     *             @OA\Property(property="assistant_id", type="integer", nullable=true, example=2, description="ID phụ xe"),
+     *             @OA\Property(property="vehicle_id", type="integer", nullable=true, example=1, description="ID phương tiện"),
+     *             @OA\Property(property="total_students", type="integer", example=25),
+     *             @OA\Property(property="curr_students", type="integer", example=20),
+     *             @OA\Property(property="type", type="integer", example=0, description="0 = Đón, 1 = Trả"),
+     *             @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
+     *             @OA\Property(property="start_time", type="string", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
+     *             @OA\Property(property="end_time", type="string", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Trip not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="assistant_id", type="array",
+     *                     @OA\Items(type="string", example="The assistant id and driver id must be different.")
+     *                 ),
+     *                 @OA\Property(property="end_time", type="array",
+     *                     @OA\Items(type="string", example="The end time must be a date after start time.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function update(CreateTripRequest $request, $id): Response
+    {
+        $tripId = intval($id);
+        $attributes = $request->validated();
+        return DB::transaction(function () use ($attributes, $tripId) {
+            $trip = $this->service->update($tripId, $attributes);
+            return $this->respond($trip);
+        }, 3);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/v1/trips/user-trips",
      *     summary="Get trips for authenticated user",

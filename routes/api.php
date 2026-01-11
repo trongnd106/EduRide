@@ -29,13 +29,6 @@ Route::get('/', function () {
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route::group(['prefix' => 'students', 'as' => 'student'], function () {
-//     Route::get('/{id}', [StudentController::class, 'show'])->name('show');
-//     Route::get('/', [StudentController::class, 'index'])->name('index');
-//     Route::post('/', [StudentController::class, 'store'])->name('store');
-//     Route::put('/{id}', [StudentController::class, 'update'])->name('update');
-//     Route::delete('/{id}', [StudentController::class, 'destroy'])->name('destroy');
-// });
 Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
 Route::apiResource('students', StudentController::class);
 Route::apiResource('schools', SchoolController::class);
@@ -55,6 +48,7 @@ Route::apiResource('points', PointController::class);
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
     Route::post('/', [TripController::class, 'store'])->name('store');
     Route::get('/', [TripController::class, 'index'])->name('index');
+    Route::get('{id}', [TripController::class, 'show'])->name('show');
     Route::get('user-trips', [TripController::class, 'getUserTrips'])->name('user.my-trips');
     Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
     Route::post('{id}/assign-point-students', [TripController::class, 'assignPointStudents'])->name('assign-point-students');
