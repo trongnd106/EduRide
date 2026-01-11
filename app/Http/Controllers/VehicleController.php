@@ -255,6 +255,51 @@ class VehicleController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/v1/vehicles/user-trips",
+     *     summary="Get vehicles from assistant's current trips",
+     *     description="Retrieves a list of unique vehicles from all current trips where the authenticated assistant is assigned. Only returns vehicles for assistants (phụ xe). Returns empty array if user is not an assistant or has no trips.",
+     *     operationId="getAssistantVehicles",
+     *     tags={"Vehicles"},
+     *     security={{"Authorization":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vehicles retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="type", type="integer", example=1, description="Loại xe"),
+     *                 @OA\Property(property="plate_number", type="string", example="30A-12345"),
+     *                 @OA\Property(property="capacity", type="integer", example=16),
+     *                 @OA\Property(property="year", type="integer", example=2020),
+     *                 @OA\Property(property="brand", type="string", example="Ford Transit"),
+     *                 @OA\Property(property="model", type="string", example="Transit 350"),
+     *                 @OA\Property(property="color", type="string", example="Trắng"),
+     *                 @OA\Property(property="status", type="integer", description="0 = Không hoạt động, 1 = Đang hoạt động", example=1),
+     *                 @OA\Property(property="created_at", type="string", nullable=true, example="2025-12-07 22:48:57"),
+     *                 @OA\Property(property="updated_at", type="string", nullable=true, example="2025-12-07 22:48:57")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - User not authenticated"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getAssistantVehicles(): Response
+    {
+        $vehicles = $this->service->getAssistantVehicles();
+        return $this->respond($vehicles);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/v1/vehicles",
      *     summary="Create a new vehicle",
