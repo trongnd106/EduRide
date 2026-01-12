@@ -39,8 +39,7 @@ class QRCodeService
             
             Storage::disk('public')->put($filePath, $qrCodeImage);
 
-            // Trả về URL của QR code image
-            return Storage::disk('public')->url($filePath);
+            return asset('storage/' . $filePath);
         } catch (\Exception $e) {
             \Log::error('Error generating QR code: ' . $e->getMessage());
             return null;
@@ -56,9 +55,13 @@ class QRCodeService
     public function delete(string $imageUrl): bool
     {
         try {
-            // Lấy path từ URL
-            $path = str_replace(Storage::disk('public')->url(''), '', $imageUrl);
-            $path = ltrim($path, '/');
+            $path = parse_url($imageUrl, PHP_URL_PATH);
+            
+            if (strpos($path, '/storage/') === 0) {
+                $path = substr($path, strlen('/storage/'));
+            } else {
+                $path = ltrim($path, '/');
+            }
             
             if (Storage::disk('public')->exists($path)) {
                 return Storage::disk('public')->delete($path);
