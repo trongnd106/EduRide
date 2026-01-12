@@ -55,14 +55,19 @@ class StudentService extends  BaseService
     /**
      * Update student and regenerate QR code image if needed.
      *
-     * @param int $id
+     * @param \Illuminate\Database\Eloquent\Model|int $parent
      * @param array $attributes
      * @return \Illuminate\Database\Eloquent\Model|bool
      * @throws \Exception
      */
-    public function update(int $id, array $attributes)
+    public function update($parent, array $attributes)
     {
-        $student = $this->show($id);
+        // Get student model if $parent is an integer
+        if (is_integer($parent)) {
+            $student = $this->show($parent);
+        } else {
+            $student = $parent;
+        }
         
         if (!isset($attributes['qr_code_image_url']) || empty($attributes['qr_code_image_url'])) {
             if ($student->qr_code_image_url) {
@@ -80,6 +85,6 @@ class StudentService extends  BaseService
             }
         }
 
-        return parent::update($id, $attributes);
+        return parent::update($parent, $attributes);
     }
 }

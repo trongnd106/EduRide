@@ -40,6 +40,10 @@ docker exec hust_prod_php php artisan config:cache
 docker exec hust_prod_php php artisan route:cache
 docker exec hust_prod_php php artisan view:cache
 
+# Generate Swagger documentation
+echo "📚 Generating Swagger documentation..."
+docker exec hust_prod_php php artisan l5-swagger:generate
+
 # Cleanup unused images
 echo "🧹 Cleaning up old images..."
 # docker image prune -f
