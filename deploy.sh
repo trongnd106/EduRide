@@ -36,7 +36,7 @@ echo "✅ MySQL is ready!"
 
 # Tạo symbolic link cho storage
 echo "🔗 Creating storage symbolic link..."
-docker exec hust_prod_php php artisan storage:link || true
+# docker exec hust_prod_php php artisan storage:link || true
 
 # Clear và cache config
 echo "🔄 Clearing cache..."
@@ -46,7 +46,7 @@ docker exec hust_prod_php php artisan view:cache
 
 # Generate Swagger documentation
 echo "📚 Generating Swagger documentation..."
-docker exec hust_prod_php php artisan l5-swagger:generate
+# docker exec hust_prod_php php artisan l5-swagger:generate
 
 # Cleanup unused images
 echo "🧹 Cleaning up old images..."
