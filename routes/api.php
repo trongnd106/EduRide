@@ -46,11 +46,6 @@ Route::apiResource('points', PointController::class);
 
 // Custom routes for trips
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
-    Route::post('/', [TripController::class, 'store'])->name('store');
-    Route::get('/', [TripController::class, 'index'])->name('index');
-    Route::get('{id}', [TripController::class, 'show'])->name('show');
-    Route::put('{id}', [TripController::class, 'update'])->name('update');
-    Route::delete('{id}', [TripController::class, 'destroy'])->name('destroy');
     Route::get('user-trips', [TripController::class, 'getUserTrips'])->name('user.my-trips');
     Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
     Route::post('{id}/assign-point-students', [TripController::class, 'assignPointStudents'])->name('assign-point-students');
