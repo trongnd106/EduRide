@@ -34,6 +34,10 @@ echo "✅ MySQL is ready!"
 #echo "📊 Running migrations..."
 #docker exec hust_prod_php php artisan migrate --force
 
+# Tạo symbolic link cho storage
+echo "🔗 Creating storage symbolic link..."
+docker exec hust_prod_php php artisan storage:link || true
+
 # Clear và cache config
 echo "🔄 Clearing cache..."
 docker exec hust_prod_php php artisan config:cache
