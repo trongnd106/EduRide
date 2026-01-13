@@ -410,8 +410,8 @@ class TripController extends Controller
     /**
      * @OA\Get(
      *     path="/api/v1/trips/{trip_id}/points/{point_id}/students",
-     *     summary="Get students pickup/dropoff at a specific point",
-     *     description="Retrieves students who get on/off at a specific point of a trip",
+     *     summary="Get students at a specific point",
+     *     description="Retrieves all students at a specific point of a trip with their status",
      *     operationId="getPointStudents",
      *     tags={"Trips"},
      *     @OA\Parameter(
@@ -437,25 +437,15 @@ class TripController extends Controller
      *             @OA\Property(property="address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội"),
      *             @OA\Property(property="type", type="integer", example=1, description="0 = Điểm phụ, 1 = Điểm dừng"),
      *             @OA\Property(
-     *                 property="students_pickup",
+     *                 property="students",
      *                 type="array",
-     *                 description="Danh sách học sinh lên xe tại điểm này",
+     *                 description="Danh sách học sinh tại điểm này",
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="student_id", type="integer", example=123),
      *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
-     *                     @OA\Property(property="grade", type="integer", example=10)
-     *                 )
-     *             ),
-     *             @OA\Property(
-     *                 property="students_dropoff",
-     *                 type="array",
-     *                 description="Danh sách học sinh xuống xe tại điểm này",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="student_id", type="integer", example=124),
-     *                     @OA\Property(property="full_name", type="string", example="Trần Thị Bình"),
-     *                     @OA\Property(property="grade", type="integer", example=11)
+     *                     @OA\Property(property="grade", type="integer", example=10, description="Khối lớp"),
+     *                     @OA\Property(property="type", type="integer", example=0, description="0 = Lên xe, 1 = Xuống xe"),
      *                 )
      *             )
      *         )

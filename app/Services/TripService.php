@@ -119,7 +119,7 @@ class TripService extends BaseService
     }
 
     /**
-     * Get students pickup/dropoff at a specific point of a trip.
+     * Get students at a specific point of a trip.
      *
      * @param int $tripId
      * @param int $pointId
@@ -137,20 +137,13 @@ class TripService extends BaseService
             ->with('student')
             ->get();
 
-        // Separate by type (0 = pickup, 1 = dropoff)
-        $studentsPickup = $pointStudents->where('type', 0)->map(function ($ps) {
+        // Map all students with their status
+        $students = $pointStudents->map(function ($ps) {
             return [
                 'student_id' => $ps->student_id,
                 'full_name' => $ps->student->full_name,
                 'grade' => $ps->student->grade,
-            ];
-        })->values()->toArray();
-
-        $studentsDropoff = $pointStudents->where('type', 1)->map(function ($ps) {
-            return [
-                'student_id' => $ps->student_id,
-                'full_name' => $ps->student->full_name,
-                'grade' => $ps->student->grade,
+                'type' => $ps->type, // 0 = Lên xe, 1 = Xuống xe
             ];
         })->values()->toArray();
 
@@ -158,8 +151,7 @@ class TripService extends BaseService
             'point_id' => $point->id,
             'address' => $point->address,
             'type' => $point->type,
-            'students_pickup' => $studentsPickup,
-            'students_dropoff' => $studentsDropoff,
+            'students' => $students,
         ];
     }
 
