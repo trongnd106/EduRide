@@ -36,6 +36,7 @@ class TripPoint extends Model
         'trip_id',
         'point_id',
         'order',
+        'status',
     ];
 
     /**
@@ -47,6 +48,7 @@ class TripPoint extends Model
         'trip_id' => 'integer',
         'point_id' => 'integer',
         'order' => 'integer',
+        'status' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
