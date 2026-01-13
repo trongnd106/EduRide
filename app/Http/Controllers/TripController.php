@@ -37,7 +37,13 @@ class TripController extends Controller
      *             @OA\Property(property="type", type="integer", example=0, description="Loại chuyến: 0 = Đón, 1 = Trả (optional, default: 0)"),
      *             @OA\Property(property="status", type="integer", example=0, description="Trạng thái: 0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành (optional, default: 0)"),
      *             @OA\Property(property="start_time", type="string", format="date-time", example="2025-12-28 07:00:00", description="Thời gian bắt đầu (optional)"),
-     *             @OA\Property(property="end_time", type="string", format="date-time", example="2025-12-28 08:30:00", description="Thời gian kết thúc (phải sau start_time, optional)")
+     *             @OA\Property(property="end_time", type="string", format="date-time", example="2025-12-28 08:30:00", description="Thời gian kết thúc (phải sau start_time, optional)"),
+     *             @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2 (optional, default: 0)"),
+     *             @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3 (optional, default: 0)"),
+     *             @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4 (optional, default: 0)"),
+     *             @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5 (optional, default: 0)"),
+     *             @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6 (optional, default: 0)"),
+     *             @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7 (optional, default: 0)")
      *         )
      *     ),
      *     @OA\Response(
@@ -56,6 +62,12 @@ class TripController extends Controller
      *             @OA\Property(property="status", type="integer", example=0, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
      *             @OA\Property(property="start_time", type="string", format="date-time", example="2025-12-28T07:00:00.000000Z", nullable=true),
      *             @OA\Property(property="end_time", type="string", format="date-time", example="2025-12-28T08:30:00.000000Z", nullable=true),
+     *             @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
+     *             @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
+     *             @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
+     *             @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5"),
+     *             @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6"),
+     *             @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z")
      *         )
@@ -542,6 +554,48 @@ class TripController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", format="date-time", example="2025-12-28 08:00:00")
      *     ),
+     *     @OA\Parameter(
+     *         name="is_mon__equal",
+     *         in="query",
+     *         description="Filter by Monday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_tue__equal",
+     *         in="query",
+     *         description="Filter by Tuesday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_wed__equal",
+     *         in="query",
+     *         description="Filter by Wednesday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_thu__equal",
+     *         in="query",
+     *         description="Filter by Thursday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_fri__equal",
+     *         in="query",
+     *         description="Filter by Friday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_sat__equal",
+     *         in="query",
+     *         description="Filter by Saturday (0 = false, 1 = true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -561,6 +615,12 @@ class TripController extends Controller
      *                     @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
      *                     @OA\Property(property="start_time", type="string", format="date-time", nullable=true, example="2025-12-28T07:00:00.000000Z"),
      *                     @OA\Property(property="end_time", type="string", format="date-time", nullable=true, example="2025-12-28T08:30:00.000000Z"),
+     *                     @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
+     *                     @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
+     *                     @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
+     *                     @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5"),
+     *                     @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6"),
+     *                     @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7"),
      *                     @OA\Property(
      *                         property="driver",
      *                         type="object",
@@ -659,6 +719,12 @@ class TripController extends Controller
      *             @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
      *             @OA\Property(property="start_time", type="string", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
      *             @OA\Property(property="end_time", type="string", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
+     *             @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
+     *             @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
+     *             @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
+     *             @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5"),
+     *             @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6"),
+     *             @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z")
      *         )
@@ -710,7 +776,13 @@ class TripController extends Controller
      *             @OA\Property(property="type", type="integer", example=0, description="Loại chuyến: 0 = Đón, 1 = Trả (optional)"),
      *             @OA\Property(property="status", type="integer", example=1, description="Trạng thái: 0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành (optional)"),
      *             @OA\Property(property="start_time", type="string", example="07:00", description="Thời gian bắt đầu (format: HH:mm, optional)"),
-     *             @OA\Property(property="end_time", type="string", example="08:30", description="Thời gian kết thúc (format: HH:mm, phải sau start_time, optional)")
+     *             @OA\Property(property="end_time", type="string", example="08:30", description="Thời gian kết thúc (format: HH:mm, phải sau start_time, optional)"),
+     *             @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2 (optional, default: 0)"),
+     *             @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3 (optional, default: 0)"),
+     *             @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4 (optional, default: 0)"),
+     *             @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5 (optional, default: 0)"),
+     *             @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6 (optional, default: 0)"),
+     *             @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7 (optional, default: 0)")
      *         )
      *     ),
      *     @OA\Response(
@@ -729,6 +801,12 @@ class TripController extends Controller
      *             @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
      *             @OA\Property(property="start_time", type="string", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
      *             @OA\Property(property="end_time", type="string", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
+     *             @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
+     *             @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
+     *             @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
+     *             @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5"),
+     *             @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6"),
+     *             @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7"),
      *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z"),
      *             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-28T10:30:00.000000Z")
      *         )
@@ -815,6 +893,12 @@ class TripController extends Controller
      *                 @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
      *                 @OA\Property(property="start_time", type="string", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
      *                 @OA\Property(property="end_time", type="string", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
+     *                 @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
+     *                 @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
+     *                 @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
+     *                 @OA\Property(property="is_thu", type="boolean", example=false, description="Thứ 5"),
+     *                 @OA\Property(property="is_fri", type="boolean", example=false, description="Thứ 6"),
+     *                 @OA\Property(property="is_sat", type="boolean", example=false, description="Thứ 7"),
      *                 @OA\Property(property="created_at", type="string", nullable=true, example="2025-12-28 10:30:00"),
      *                 @OA\Property(property="updated_at", type="string", nullable=true, example="2025-12-28 10:30:00")
      *             )
