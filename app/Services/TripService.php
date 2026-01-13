@@ -321,5 +321,85 @@ class TripService extends BaseService
             ];
         })->toArray();
     }
+
+    /**
+     * Check in a student using QR code.
+     * 
+     * @param int $tripId
+     * @param string $qrCode QR code string đã được scan từ frontend
+     * @param int $flag 0 = Lên xe, 1 = Xuống xe
+     * @param int $pointId
+     * @return array
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function checkInStudent(int $tripId, string $qrCode, int $flag, int $pointId): array
+    {
+        // Verify trip exists
+        $trip = $this->show($tripId);
+
+        $studentId = null;
+        if (preg_match('/^STUDENT_(\d+)$/', $qrCode, $matches)) {
+            $studentId = (int) $matches[1];
+        } else {
+            $studentId = is_numeric($qrCode) ? (int) $qrCode : null;
+        }
+        
+        if (!$studentId) {
+            throw new \InvalidArgumentException('QR code không hợp lệ. Không thể xác định student_id từ QR code.');
+        }
+        
+        // Verify student exists
+        $student = \App\Models\Student::findOrFail($studentId);
+        
+        // Verify point exists
+        $point = \App\Models\Point::findOrFail($pointId);
+        
+        // Verify trip_point exists
+        $tripPoint = \App\Models\TripPoint::where('trip_id', $tripId)
+            ->where('point_id', $pointId)
+            ->firstOrFail();
+        
+        // Verify trip_student exists
+        $tripStudent = TripStudent::where('trip_id', $tripId)
+            ->where('student_id', $studentId)
+            ->firstOrFail();
+        
+        // Verify point_student exists
+        $pointStudent = \App\Models\PointStudent::where('trip_id', $tripId)
+            ->where('point_id', $pointId)
+            ->where('student_id', $studentId)
+            ->firstOrFail();
+        
+        // Update trip_students: check_in = 1, status = flag
+        $tripStudent->update([
+            'check_in' => 1,
+            'status' => $flag,
+            'method' => 1,
+        ]);
+        
+        // Update point_students: type = flag
+        $pointStudent->update([
+            'type' => $flag,
+        ]);
+        
+        // Update trip_points: status = 1
+        $tripPoint->update([
+            'status' => 1,
+        ]);
+        
+        return [
+            'success' => true,
+            'message' => 'Điểm danh thành công!',
+            'data' => [
+                'trip_id' => $tripId,
+                'student_id' => $studentId,
+                'student_name' => $student->full_name,
+                'point_id' => $pointId,
+                'point_address' => $point->address,
+                'flag' => $flag,
+                'flag_description' => $flag === 1 ? 'Xuống xe' : 'Lên xe',
+            ],
+        ];
+    }
 }
 

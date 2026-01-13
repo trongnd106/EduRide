@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignStudentsRequest;
 use App\Http\Requests\AssignTripPointStudentsRequest;
+use App\Http\Requests\CheckInStudentRequest;
 use App\Http\Requests\CreateTripRequest;
 use App\Services\TripService;
 use Illuminate\Http\Request;
@@ -918,6 +919,86 @@ class TripController extends Controller
     {
         $trips = $this->service->getUserTrip();
         return $this->respond($trips);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/trips/check-in",
+     *     summary="Check in a student using QR code",
+     *     description="Điểm danh học sinh bằng QR code. Cập nhật check_in trong trip_students, status trong trip_students và point_students, type trong point_students, và status trong trip_points.",
+     *     operationId="checkInStudent",
+     *     tags={"Trips"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"trip_id", "qr_code", "flag", "point_id"},
+     *             @OA\Property(property="trip_id", type="integer", example=1, description="ID của chuyến đi"),
+     *             @OA\Property(property="qr_code", type="string", example="STUDENT_123", description="Mã QR code của học sinh (format: STUDENT_{student_id})"),
+     *             @OA\Property(property="flag", type="integer", example=0, description="0 = Lên xe, 1 = Xuống xe"),
+     *             @OA\Property(property="point_id", type="integer", example=1, description="ID của điểm dừng")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Check in successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Điểm danh thành công"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="trip_id", type="integer", example=1),
+     *                 @OA\Property(property="student_id", type="integer", example=123),
+     *                 @OA\Property(property="student_name", type="string", example="Nguyễn Văn A"),
+     *                 @OA\Property(property="point_id", type="integer", example=1),
+     *                 @OA\Property(property="point_address", type="string", example="Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội"),
+     *                 @OA\Property(property="flag", type="integer", example=0, description="0 = Lên xe, 1 = Xuống xe"),
+     *                 @OA\Property(property="flag_description", type="string", example="Lên xe")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip, Student, Point, TripPoint, TripStudent, or PointStudent not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Trip not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="qr_code", type="array",
+     *                     @OA\Items(type="string", example="QR code không hợp lệ. Format: STUDENT_{student_id}")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function checkIn(CheckInStudentRequest $request): Response
+    {
+        $validated = $request->validated();
+        
+        return DB::transaction(function () use ($validated) {
+            $result = $this->service->checkInStudent(
+                $validated['trip_id'],
+                $validated['qr_code'],
+                $validated['flag'],
+                $validated['point_id']
+            );
+            return $this->respond($result);
+        }, 3);
     }
 
     /**
