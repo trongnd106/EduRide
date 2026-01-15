@@ -59,13 +59,10 @@ def read_pickups(filename):
 def sweep_assignment(pickups):
     for p in pickups:
         p["angle"] = polar_angle(p["lat"], p["lon"])
-
     pickups.sort(key=lambda x: x["angle"])
-
     routes = []
     current_route = []
     current_load = 0
-
     for p in pickups:
         if current_load + p["demand"] <= VEHICLE_CAPACITY:
             current_route.append(p)
@@ -74,12 +71,9 @@ def sweep_assignment(pickups):
             routes.append(current_route)
             current_route = [p]
             current_load = p["demand"]
-
     if current_route:
         routes.append(current_route)
-
     assert len(routes) <= MAX_VEHICLES, "Số xe vượt quá giới hạn"
-
     return routes
 
 # --------------------------------------------------------------
@@ -89,12 +83,9 @@ def sweep_assignment(pickups):
 def nearest_neighbor_route(route):
     if not route:
         return route
-
     unvisited = route[:]
     ordered = []
-
     current_lat, current_lon = DEPOT_LAT, DEPOT_LON
-
     while unvisited:
         next_p = min(
             unvisited,
@@ -103,24 +94,20 @@ def nearest_neighbor_route(route):
         ordered.append(next_p)
         current_lat, current_lon = next_p["lat"], next_p["lon"]
         unvisited.remove(next_p)
-
     return ordered
 
 def route_length(route):
     length = 0.0
     cur_lat, cur_lon = DEPOT_LAT, DEPOT_LON
-
     for p in route:
         length += haversine(cur_lat, cur_lon, p["lat"], p["lon"])
         cur_lat, cur_lon = p["lat"], p["lon"]
-
     length += haversine(cur_lat, cur_lon, DEPOT_LAT, DEPOT_LON)
     return length
 
 def two_opt(route):
     best = route
     best_len = route_length(route)
-
     improved = True
     while improved:
         improved = False
@@ -134,7 +121,6 @@ def two_opt(route):
                     best_len = new_len
                     improved = True
         route = best
-
     return best
 
 # --------------------------------------------------------------
@@ -143,26 +129,21 @@ def two_opt(route):
 
 def plot_routes(routes):
     m = folium.Map(location=[DEPOT_LAT, DEPOT_LON], zoom_start=12)
-
     folium.Marker(
         [DEPOT_LAT, DEPOT_LON],
         popup=DEPOT_NAME,
         icon=folium.Icon(color="red", icon="home")
     ).add_to(m)
-
     colors = [
         "blue", "green", "purple", "orange", "darkred",
         "cadetblue", "darkgreen", "pink", "gray", "black"
     ]
-
     for i, route in enumerate(routes):
         color = colors[i % len(colors)]
-
         points = [[DEPOT_LAT, DEPOT_LON]]
         for p in route:
             points.append([p["lat"], p["lon"]])
         points.append([DEPOT_LAT, DEPOT_LON])
-
         folium.PolyLine(
             locations=points,
             color=color,
@@ -170,7 +151,6 @@ def plot_routes(routes):
             opacity=0.8,
             popup=f"Xe {i} ({sum(p['demand'] for p in route)} HS)"
         ).add_to(m)
-
         for p in route:
             folium.CircleMarker(
                 [p["lat"], p["lon"]],
@@ -179,7 +159,6 @@ def plot_routes(routes):
                 fill=True,
                 fill_opacity=0.7
             ).add_to(m)
-
     m.save(OUTPUT_MAP)
     print(f"Đã lưu bản đồ tuyến xe: {OUTPUT_MAP}")
 
@@ -187,19 +166,27 @@ def plot_routes(routes):
 # 7. Main
 # --------------------------------------------------------------
 
+def solve_vrp(pickups, optimize=True):
+    """
+    Hàm lõi cho VRP.
+    - pickups: list of dict {id, lat, lon, demand}
+    - optimize: có chạy NN + 2-opt hay không
+    Trả về: list routes (JSON-friendly)
+    """
+    routes = sweep_assignment(pickups)
+    if optimize:
+        optimized_routes = []
+        for r in routes:
+            r = nearest_neighbor_route(r)
+            r = two_opt(r)
+            optimized_routes.append(r)
+        routes = optimized_routes
+    return routes
+
 if __name__ == "__main__":
     pickups = read_pickups(INPUT_CSV)
-
-    routes = sweep_assignment(pickups)
-
-    optimized_routes = []
-    for r in routes:
-        r = nearest_neighbor_route(r)
-        r = two_opt(r)
-        optimized_routes.append(r)
-
-    max_len = max(route_length(r) for r in optimized_routes)
-    print(f"Số xe sử dụng: {len(optimized_routes)}")
+    routes = solve_vrp(pickups, optimize=True)
+    max_len = max(route_length(r) for r in routes)
+    print(f"Số xe sử dụng: {len(routes)}")
     print(f"Chiều dài tuyến dài nhất: {max_len:.2f} km")
-
-    plot_routes(optimized_routes)
+    plot_routes(routes)

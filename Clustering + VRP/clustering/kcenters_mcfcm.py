@@ -42,33 +42,24 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
-students = []
-must_link = []
-cannot_link = []
-
-def readData():
-    with open('hanoi_students_400.csv', 'r', newline='') as csvfile:
+def readData(student_file, must_link_file, cannot_link_file):
+    students, must_link, cannot_link = [], [], []
+    with open(student_file, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
-        header = next(reader)
+        next(reader)
         for row in reader:
-            row[0] = int(row[0]) - 1
-            row[1] = float(row[1])
-            row[2] = float(row[2])
-            students.append(row)
-    with open('must_link.csv', 'r', newline='') as csvfile:
+            students.append([int(row[0]) - 1, float(row[1]), float(row[2])])
+    with open(must_link_file, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
-        header = next(reader)
+        next(reader)
         for row in reader:
-            row[0] = int(row[0])
-            row[1] = int(row[1])
-            must_link.append(row)
-    with open('cannot_link.csv', 'r', newline='') as csvfile:
+            must_link.append([int(row[0]), int(row[1])])
+    with open(cannot_link_file, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
-        header = next(reader)
+        next(reader)
         for row in reader:
-            row[0] = int(row[0])
-            row[1] = int(row[1])
-            cannot_link.append(row)
+            cannot_link.append([int(row[0]), int(row[1])])
+    return students, must_link, cannot_link
 
 def plot_clusters_map(students, clusters):
     m = folium.Map(location=[21.0436, 105.83246], zoom_start=11)
@@ -251,27 +242,36 @@ def MCFCM_refine(
 
     return clusters, U
 
-def export_pickup_points(clusters, students, filename):
-    rows = []
-    for c in clusters:
-        rows.append({
+def export_pickup_points(clusters):
+    return [
+        {
             "pickup_id": c.id,
             "lat": c.centroid[0],
             "lon": c.centroid[1],
             "num_students": len(c.members)
-        })
-    pd.DataFrame(rows).to_csv(filename, index=False)
+        }
+        for c in clusters
+    ]
 
+def run_clustering_pipeline(students, must_link, cannot_link, radius = 0.5, Rmax = 0.5):
+    clusters = kCentersGonzalez(students, radius)
+    clusters, _ = MCFCM_refine(students, clusters, must_link, cannot_link, Rmax=Rmax)
+    return clusters
+
+def demo_from_csv(
+    student_file="hanoi_students_400.csv",
+    must_link_file="must_link.csv",
+    cannot_link_file="cannot_link.csv",
+    radius=0.5,
+    Rmax=0.5,
+    output_csv="pickup_points.csv",
+):
+    students, must_link, cannot_link = readData(student_file, must_link_file, cannot_link_file)
+    clusters = run_clustering_pipeline(students, must_link, cannot_link, radius, Rmax)
+    plot_clusters_map(students, clusters)
+    rows = export_pickup_points(clusters)
+    pd.DataFrame(rows).to_csv(output_csv, index=False)
+    print(f"Exported {len(rows)} pickup points")
 
 if __name__ == "__main__":
-    readData()
-    clusters = kCentersGonzalez(students, 0.5)
-    clusters, U = MCFCM_refine(
-        students,
-        clusters,
-        must_link,
-        cannot_link,
-        Rmax=0.5
-    )
-    plot_clusters_map(students, clusters)
-    export_pickup_points(clusters, students, "pickup_points.csv")
+    demo_from_csv()
