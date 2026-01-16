@@ -339,6 +339,136 @@ class StudentController extends Controller
         return $this->respond(['data' => $result]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/students",
+     *     summary="Get a paginated list of students",
+     *     description="Retrieves a paginated list of students with optional filtering and parent relationship",
+     *     operationId="getStudentsList",
+     *     tags={"Students"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="student_number__equal",
+     *         in="query",
+     *         description="Filter by student number (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="20225105")
+     *     ),
+     *     @OA\Parameter(
+     *         name="student_number__like",
+     *         in="query",
+     *         description="Filter by student number (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="20225")
+     *     ),
+     *     @OA\Parameter(
+     *         name="email__like",
+     *         in="query",
+     *         description="Filter by email (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="@sis.hust.edu.vn")
+     *     ),
+     *     @OA\Parameter(
+     *         name="full_name__like",
+     *         in="query",
+     *         description="Filter by full name (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Nguyễn")
+     *     ),
+     *     @OA\Parameter(
+     *         name="phone__like",
+     *         in="query",
+     *         description="Filter by phone number (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="0987")
+     *     ),
+     *     @OA\Parameter(
+     *         name="gender__equal",
+     *         in="query",
+     *         description="Filter by gender (1 = Nam, 0 = Nữ)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="grade__equal",
+     *         in="query",
+     *         description="Filter by grade",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=4)
+     *     ),
+     *     @OA\Parameter(
+     *         name="status__equal",
+     *         in="query",
+     *         description="Filter by status (0 = Đang học, 1 = Tốt nghiệp)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=0)
+     *     ),
+     *     @OA\Parameter(
+     *         name="address__like",
+     *         in="query",
+     *         description="Filter by address (partial match)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Hà Nội")
+     *     ),
+     *     @OA\Parameter(
+     *         name="student_parent_id__equal",
+     *         in="query",
+     *         description="Filter by student parent ID (exact match)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=73),
+     *                     @OA\Property(property="student_number", type="string", example="20225105"),
+     *                     @OA\Property(property="email", type="string", format="email", nullable=true, example="nam.nguyen225105@sis.hust.edu.vn"),
+     *                     @OA\Property(property="full_name", type="string", example="Nguyễn Văn Nam"),
+     *                     @OA\Property(property="phone", type="string", nullable=true, example="0987654321"),
+     *                     @OA\Property(property="gender", type="integer", description="1 = Nam, 0 = Nữ", example=1),
+     *                     @OA\Property(property="dob", type="string", format="date", nullable=true, example="2004-05-15"),
+     *                     @OA\Property(property="grade", type="integer", nullable=true, example=4),
+     *                     @OA\Property(property="address", type="string", nullable=true, example="123 Đường Láng, Quận Đống Đa, Hà Nội"),
+     *                     @OA\Property(property="student_parent_id", type="integer", nullable=true, example=1),
+     *                     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=21.028511, description="Vĩ độ GPS"),
+     *                     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=105.804817, description="Kinh độ GPS"),
+     *                     @OA\Property(property="qr_code_image_url", type="string", nullable=true, example="http://example.com/storage/qr-codes/students/student_73.png", description="URL ảnh QR code để scan điểm danh (QR code chứa mã STUDENT_{student_id})"),
+     *                     @OA\Property(property="status", type="integer", description="0 = Đang học, 1 = Tốt nghiệp", example=0),
+     *                     @OA\Property(
+     *                         property="parent",
+     *                         type="object",
+     *                         nullable=true,
+     *                         description="Thông tin phụ huynh",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="full_name", type="string", example="Nguyễn Văn An"),
+     *                         @OA\Property(property="phone_number", type="string", example="0987654321")
+     *                     )
+     *                 )
+     *             ),
+     *             @OA\Property(property="total", type="integer", example=72, description="Total number of records"),
+     *             @OA\Property(property="last_page", type="integer", example=8, description="Last page number"),
+     *             @OA\Property(property="from", type="integer", example=1, description="Starting record index"),
+     *             @OA\Property(property="to", type="integer", example=10, description="Ending record index"),
+     *             @OA\Property(property="current_page", type="integer", example=1, description="Current page number")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
     public function index(Request $request): Response
     {
         $column = [
