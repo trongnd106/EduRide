@@ -1,10 +1,10 @@
 from fastapi import APIRouter
-from schemas import ClusteringRequest, VRPRequest
-from kcenters_mcfcm import (
+from api.schemas import ClusteringRequest, VRPRequest
+from clustering.kcenters_mcfcm import (
     run_clustering_pipeline,
     export_pickup_points
 )
-from vrp_solver import solve_vrp
+from vrp.vrp_solver import solve_vrp
 
 router = APIRouter()
 
@@ -38,8 +38,10 @@ def run_vrp(req: VRPRequest):
         }
         for p in req.pickup_points
     ]
-    routes = solve_vrp(pickups,
-        max_capacity=req.max_capacity,
+    routes = solve_vrp(pickups=pickups,
+        depot_lat=req.depot.lat,
+        depot_lon=req.depot.lon,
+        vehicle_capacity=req.vehicle_capacity,
         max_vehicles=req.max_vehicles,
         optimize=True)
     return {

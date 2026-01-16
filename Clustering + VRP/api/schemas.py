@@ -19,7 +19,14 @@ class ClusteringRequest(BaseModel):
     radius: float = 0.5
     Rmax: float = 0.5
 
+class Depot(BaseModel):
+    lat: float
+    lon: float
+    name: str | None = None
+
+
 class VRPRequest(BaseModel):
     pickup_points: List[PickupPoint]
-    max_capacity: int = 29
+    depot: Depot
+    vehicle_capacity: int = 29
     max_vehicles: int = 20

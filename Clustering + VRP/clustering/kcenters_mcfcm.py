@@ -91,8 +91,8 @@ def plot_clusters_map(students, clusters):
             popup=f"Tâm cụm {i} ({len(cluster.members)} HS)",
             icon=folium.Icon(color='black', icon='flag')
         ).add_to(m)
-    m.save('clusters_map.html')
-    print(f"Bản đồ đã được lưu tại 'clusters_map.html' (k = {len(clusters)})")
+    m.save('demo/clusters_map.html')
+    print(f"Bản đồ đã được lưu tại 'demo/clusters_map.html' (k = {len(clusters)})")
 
 def kCentersGonzalez(students, radius):
     n = len(students)
@@ -259,12 +259,12 @@ def run_clustering_pipeline(students, must_link, cannot_link, radius = 0.5, Rmax
     return clusters
 
 def demo_from_csv(
-    student_file="hanoi_students_400.csv",
-    must_link_file="must_link.csv",
-    cannot_link_file="cannot_link.csv",
+    student_file="demo/hanoi_students_400.csv",
+    must_link_file="demo/must_link.csv",
+    cannot_link_file="demo/cannot_link.csv",
     radius=0.5,
     Rmax=0.5,
-    output_csv="pickup_points.csv",
+    output_csv="demo/pickup_points.csv",
 ):
     students, must_link, cannot_link = readData(student_file, must_link_file, cannot_link_file)
     clusters = run_clustering_pipeline(students, must_link, cannot_link, radius, Rmax)
