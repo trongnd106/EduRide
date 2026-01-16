@@ -534,16 +534,16 @@ class TripController extends Controller
      *     @OA\Parameter(
      *         name="start_time__from",
      *         in="query",
-     *         description="Filter trips with start_time from this date (format: Y-m-d H:i:s)",
+     *         description="Filter trips with start_time from this time (format: HH:mm)",
      *         required=false,
-     *         @OA\Schema(type="string", format="date-time", example="2025-12-28 07:00:00")
+     *         @OA\Schema(type="string", format="time", example="07:00")
      *     ),
      *     @OA\Parameter(
      *         name="start_time__to",
      *         in="query",
-     *         description="Filter trips with start_time to this date (format: Y-m-d H:i:s)",
+     *         description="Filter trips with start_time to this time (format: HH:mm)",
      *         required=false,
-     *         @OA\Schema(type="string", format="date-time", example="2025-12-28 08:00:00")
+     *         @OA\Schema(type="string", format="time", example="08:00")
      *     ),
      *     @OA\Parameter(
      *         name="is_mon__equal",
@@ -604,8 +604,8 @@ class TripController extends Controller
      *                     @OA\Property(property="curr_students", type="integer", example=0),
      *                     @OA\Property(property="type", type="integer", example=0, description="0 = Đón, 1 = Trả"),
      *                     @OA\Property(property="status", type="integer", example=1, description="0 = Chưa bắt đầu, 1 = Đang diễn ra, 2 = Đã hoàn thành"),
-     *                     @OA\Property(property="start_time", type="string", format="date-time", nullable=true, example="2025-12-28T07:00:00.000000Z"),
-     *                     @OA\Property(property="end_time", type="string", format="date-time", nullable=true, example="2025-12-28T08:30:00.000000Z"),
+     *                     @OA\Property(property="start_time", type="string", format="time", nullable=true, example="07:00", description="Thời gian bắt đầu (format: HH:mm)"),
+     *                     @OA\Property(property="end_time", type="string", format="time", nullable=true, example="08:30", description="Thời gian kết thúc (format: HH:mm)"),
      *                     @OA\Property(property="is_mon", type="boolean", example=false, description="Thứ 2"),
      *                     @OA\Property(property="is_tue", type="boolean", example=false, description="Thứ 3"),
      *                     @OA\Property(property="is_wed", type="boolean", example=false, description="Thứ 4"),
