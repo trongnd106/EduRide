@@ -19,8 +19,8 @@ class Cluster:
     def update_centroid(self, students):
         if not self.members:
             return
-        avg_lat = sum(students[i][1] for i in self.members) / len(self.members)
-        avg_lon = sum(students[i][2] for i in self.members) / len(self.members)
+        avg_lat = sum(students[sid]["lat"] for sid in self.members) / len(self.members)
+        avg_lon = sum(students[sid]["lon"] for sid in self.members) / len(self.members)
         self.centroid = [avg_lat, avg_lon]
 
     def compute_max_distance(self, students):
@@ -28,8 +28,8 @@ class Cluster:
             self.max_distance = 0
             return
         distances = [
-            haversine_distance(students[i][1], students[i][2], self.centroid[0], self.centroid[1])
-            for i in self.members
+            haversine_distance(students[sid]["lat"], students[sid]["lon"], self.centroid[0], self.centroid[1])
+            for sid in self.members
         ]
         self.max_distance = max(distances)
 
@@ -43,12 +43,13 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     return R * c
 
 def readData(student_file, must_link_file, cannot_link_file):
-    students, must_link, cannot_link = [], [], []
+    students = {}
+    must_link, cannot_link = [], []
     with open(student_file, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
         next(reader)
         for row in reader:
-            students.append([int(row[0]) - 1, float(row[1]), float(row[2])])
+            students[int(row[0])] = {"lat": float(row[1]), "lon": float(row[2])}
     with open(must_link_file, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
         next(reader)
@@ -77,8 +78,8 @@ def plot_clusters_map(students, clusters):
 
     for i, cluster in enumerate(clusters):
         color = colors[i]
-        for idx in cluster.members:
-            lat, lon = students[idx][1], students[idx][2]
+        for sid in cluster.members:
+            lat, lon = students[sid]["lat"], students[sid]["lon"]
             folium.CircleMarker(
                 location=[lat, lon],
                 radius=3,
@@ -95,44 +96,36 @@ def plot_clusters_map(students, clusters):
     print(f"Bản đồ đã được lưu tại 'demo/clusters_map.html' (k = {len(clusters)})")
 
 def kCentersGonzalez(students, radius):
-    n = len(students)
-    first_id = random.randint(0, n - 1) # Chọn ngẫu nhiên tâm đầu tiên
+    student_ids = list(students.keys())
+    first_id = random.choice(student_ids) # Chọn ngẫu nhiên tâm đầu tiên
     centers = [first_id]
     while True:
         max_dist = -1
         farthest_id = None
-        for i in range(n):
-            lat, lon = students[i][1], students[i][2]
-            min_dist = float('inf')
-            for c in centers:
-                clat, clon = students[c][1], students[c][2]
-                d = haversine_distance(lat, lon, clat, clon)
-                min_dist = min(min_dist, d)
+        for sid in student_ids:
+            lat, lon = students[sid]["lat"], students[sid]["lon"]
+            min_dist = min(
+                haversine_distance(lat, lon, students[c]["lat"], students[c]["lon"])
+                for c in centers
+            )
             if min_dist > max_dist:
                 max_dist = min_dist
-                farthest_id = i
+                farthest_id = sid
         if max_dist <= radius:
             break
         centers.append(farthest_id)
 
     # Tạo đối tượng Cluster gán mỗi học sinh vào tâm gần nhất
     clusters = []
-    for idx, c in enumerate(centers):
-        lat, lon = students[c][1], students[c][2]
-        clusters.append(Cluster(idx, lat, lon))
-    for i in range(n):
-        lat, lon = students[i][1], students[i][2]
-        best_cluster = None
-        best_dist = float('inf')
-        for cluster in clusters:
-            d = haversine_distance(
-                lat, lon,
-                cluster.centroid[0], cluster.centroid[1]
-            )
-            if d < best_dist:
-                best_dist = d
-                best_cluster = cluster
-        best_cluster.add_member(i)
+    for cid, sid in enumerate(centers):
+        clusters.append(Cluster(cid, students[sid]["lat"], students[sid]["lon"]))
+    for sid in student_ids:
+        lat, lon = students[sid]["lat"], students[sid]["lon"]
+        best_cluster = min(
+            clusters,
+            key=lambda c: haversine_distance(lat, lon, c.centroid[0], c.centroid[1])
+        )
+        best_cluster.add_member(sid)
 
     # 5. Tính max distance cho mỗi cụm (để kiểm tra)
     for cluster in clusters:
@@ -159,72 +152,66 @@ def MCFCM_refine(
     lambda_cl=5.0,
     lambda_r=50.0
 ):
-    N = len(students)
+    student_ids = list(students.keys())
     K = len(clusters)
 
     ml_graph = build_constraint_graph(must_link)
     cl_graph = build_constraint_graph(cannot_link)
 
     # Init U từ kết quả Gonzalez
-    U = [[0.0]*K for _ in range(N)]
+    U = {sid: [0.0]*K for sid in students}
     for k, cluster in enumerate(clusters):
-        for i in cluster.members:
-            U[i][k] = 1.0
+        for sid in cluster.members:
+            U[sid][k] = 1.0
 
     # Adaptive weights a_i và m_i
-    a = [1.0]*N
-    m = [2.0]*N   # khởi tạo
+    a = {sid: 1.0 for sid in student_ids}
+    m = {sid: 2.0 for sid in student_ids}   # khởi tạo
 
     for it in range(max_iters):
 
         # Update adaptive a_i, m_i
-        for i in range(N):
+        for sid in student_ids:
             entropy = -sum(
                 u * math.log(u + 1e-12)
-                for u in U[i]
+                for u in U[sid]
             )
-            a[i] = 1.0 + entropy              # điểm mơ hồ → a_i lớn
-            m[i] = 1.5 + 0.5 * entropy        # m_i ∈ [1.5, ~2.5]
+            a[sid] = 1.0 + entropy              # điểm mơ hồ → a_i lớn
+            m[sid] = 1.5 + 0.5 * entropy        # m_i ∈ [1.5, ~2.5]
 
         # Update membership
-        for i in range(N):
-            lat, lon = students[i][1], students[i][2]
+        for sid in student_ids:
+            lat, lon = students[sid]["lat"], students[sid]["lon"]
             D = []
 
             for k, cluster in enumerate(clusters):
                 # distance
-                d = haversine_distance(
-                    lat, lon,
-                    cluster.centroid[0],
-                    cluster.centroid[1]
-                )
+                d = haversine_distance(lat, lon, cluster.centroid[0], cluster.centroid[1])
 
                 # radius penalty
                 pr = lambda_r * max(0, d - Rmax) ** 2
 
                 # must-link penalty
                 pml = 0.0
-                for j in ml_graph.get(i, []):
-                    pml += sum(
-                        (U[i][kk] - U[j][kk]) ** 2
-                        for kk in range(K)
-                    )
+                for sj in ml_graph.get(sid, []):
+                    if sj not in U:
+                        continue
+                    pml += sum((U[sid][kk] - U[sj][kk]) ** 2 for kk in range(K))
 
                 # cannot-link penalty
                 pcl = 0.0
-                for j in cl_graph.get(i, []):
-                    pcl += U[i][k] * U[j][k]
+                for sj in cl_graph.get(sid, []):
+                    if sj not in U:
+                        continue
+                    pcl += U[sid][k] * U[sj][k]
 
                 cost = d**2 + pr + lambda_ml*pml + lambda_cl*pcl
                 D.append(cost + 1e-12)
 
             # normalize
             for k in range(K):
-                denom = sum(
-                    (D[k] / D[j]) ** (1 / (m[i] - 1))
-                    for j in range(K)
-                )
-                U[i][k] = 1.0 / denom
+                denom = sum((D[k] / D[j]) ** (1 / (m[sid] - 1)) for j in range(K))
+                U[sid][k] = 1.0 / denom
 
         if it % 5 == 0:
             print(f"MC-FCM iteration {it}")
@@ -233,9 +220,9 @@ def MCFCM_refine(
     for cluster in clusters:
         cluster.clear_members()
 
-    for i in range(N):
-        k = max(range(K), key=lambda kk: U[i][kk])
-        clusters[k].add_member(i)
+    for sid in student_ids:
+        k = max(range(K), key=lambda kk: U[sid][kk])
+        clusters[k].add_member(sid)
 
     for cluster in clusters:
         cluster.compute_max_distance(students)
@@ -253,8 +240,18 @@ def export_pickup_points(clusters):
         for c in clusters
     ]
 
-def run_clustering_pipeline(students, must_link, cannot_link, radius = 0.5, Rmax = 0.5):
-    clusters = kCentersGonzalez(students, radius)
+def export_assignment(clusters):
+    pairs = []
+    for c in clusters:
+        for sid in c.members:
+            pairs.append({
+                "student_id": sid,
+                "cluster_id": c.id
+            })
+    return pairs
+
+def run_clustering_pipeline(students, must_link, cannot_link, Rmax = 0.5):
+    clusters = kCentersGonzalez(students, Rmax * 1.2) # radius_gonzalez = 1.2 * Rmax (soft init)
     clusters, _ = MCFCM_refine(students, clusters, must_link, cannot_link, Rmax=Rmax)
     return clusters
 
@@ -262,16 +259,19 @@ def demo_from_csv(
     student_file="demo/hanoi_students_400.csv",
     must_link_file="demo/must_link.csv",
     cannot_link_file="demo/cannot_link.csv",
-    radius=0.5,
     Rmax=0.5,
-    output_csv="demo/pickup_points.csv",
+    pickup_output="demo/pickup_points.csv",
+    assignment_output="demo/assignment.csv"
 ):
     students, must_link, cannot_link = readData(student_file, must_link_file, cannot_link_file)
-    clusters = run_clustering_pipeline(students, must_link, cannot_link, radius, Rmax)
+    clusters = run_clustering_pipeline(students, must_link, cannot_link, Rmax)
     plot_clusters_map(students, clusters)
     rows = export_pickup_points(clusters)
-    pd.DataFrame(rows).to_csv(output_csv, index=False)
+    pd.DataFrame(rows).to_csv(pickup_output, index=False)
     print(f"Exported {len(rows)} pickup points")
+    rows = export_assignment(clusters)
+    pd.DataFrame(rows).to_csv(assignment_output, index=False)
+    print(f"Exported {len(rows)} assignments")
 
 if __name__ == "__main__":
     demo_from_csv()

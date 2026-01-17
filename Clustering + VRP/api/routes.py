@@ -1,33 +1,30 @@
 from fastapi import APIRouter
-from api.schemas import ClusteringRequest, VRPRequest
+from api.schemas import ClusteringRequest, ClusteringResponse, VRPRequest, VRPResponse
 from clustering.kcenters_mcfcm import (
     run_clustering_pipeline,
-    export_pickup_points
+    export_pickup_points,
+    export_assignment
 )
 from vrp.vrp_solver import solve_vrp
 
 router = APIRouter()
 
-@router.post("/clustering")
+@router.post("/clustering", response_model = ClusteringResponse)
 def run_clustering(req: ClusteringRequest):
-    students = [
-        [s.id, s.lat, s.lon]
-        for s in req.students
-    ]
+    students = {s.id: {"lat": s.lat, "lon": s.lon} for s in req.students}
     clusters = run_clustering_pipeline(
         students=students,
         must_link=req.must_link,
         cannot_link=req.cannot_link,
-        radius=req.radius,
         Rmax=req.Rmax
     )
-    pickup_points = export_pickup_points(clusters)
     return {
-        "num_clusters": len(pickup_points),
-        "pickup_points": pickup_points
+        "num_clusters": len(clusters),
+        "assignment": export_assignment(clusters),
+        "pickup_points": export_pickup_points(clusters)
     }
 
-@router.post("/vrp")
+@router.post("/vrp", response_model = VRPResponse)
 def run_vrp(req: VRPRequest):
     pickups = [
         {

@@ -162,7 +162,15 @@ def solve_vrp(pickups, depot_lat, depot_lon, vehicle_capacity, max_vehicles, opt
             r = two_opt(r, depot_lat, depot_lon)
             optimized_routes.append(r)
         routes = optimized_routes
-    return routes
+    api_routes = []
+    for vehicle_id, route in enumerate(routes):
+        api_routes.append({
+            "vehicle_id": vehicle_id,
+            "stops": [p["id"] for p in route],
+            "total_students": sum(p["demand"] for p in route),
+            "total_distance_km": route_length(route, depot_lat, depot_lon)
+        })
+    return api_routes
 
 if __name__ == "__main__":
     DEPOT_LAT = 21.0436
