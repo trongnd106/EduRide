@@ -153,6 +153,17 @@ def plot_routes(routes, depot_lat, depot_lon, depot_name, output_map):
 # 6. Main
 # --------------------------------------------------------------
 
+def solve_vrp_internal(pickups, depot_lat, depot_lon, vehicle_capacity, max_vehicles, optimize=True):
+    routes = sweep_assignment(pickups, depot_lat, depot_lon, vehicle_capacity, max_vehicles)
+    if optimize:
+        optimized = []
+        for r in routes:
+            r = nearest_neighbor_route(r, depot_lat, depot_lon)
+            r = two_opt(r, depot_lat, depot_lon)
+            optimized.append(r)
+        routes = optimized
+    return routes
+
 def solve_vrp(pickups, depot_lat, depot_lon, vehicle_capacity, max_vehicles, optimize=True):
     routes = sweep_assignment(pickups, depot_lat, depot_lon, vehicle_capacity, max_vehicles)
     if optimize:
@@ -181,7 +192,7 @@ if __name__ == "__main__":
     INPUT_CSV = "demo/pickup_points.csv"
     OUTPUT_MAP = "demo/bus_routes.html"
     pickups = read_pickups(INPUT_CSV)
-    routes = solve_vrp(pickups, DEPOT_LAT, DEPOT_LON, VEHICLE_CAPACITY, MAX_VEHICLES, optimize=True)
+    routes = solve_vrp_internal(pickups, DEPOT_LAT, DEPOT_LON, VEHICLE_CAPACITY, MAX_VEHICLES, optimize=True)
     max_len = max(route_length(r, DEPOT_LAT, DEPOT_LON) for r in routes)
     print(f"Số xe sử dụng: {len(routes)}")
     print(f"Chiều dài tuyến dài nhất: {max_len:.2f} km")
