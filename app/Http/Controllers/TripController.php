@@ -7,15 +7,21 @@ use App\Http\Requests\AssignTripPointStudentsRequest;
 use App\Http\Requests\CheckInStudentRequest;
 use App\Http\Requests\CreateTripRequest;
 use App\Services\TripService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class TripController extends Controller
 {
-    public function __construct(TripService $tripService)
-    {
+    protected $notificationService;
+
+    public function __construct(
+        TripService $tripService,
+        NotificationService $notificationService
+    ) {
         parent::__construct($tripService);
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -736,6 +742,7 @@ class TripController extends Controller
      */
     public function show($id): Response
     {
+        $id = intval($id);
         $relation = ["driver:id,full_name", "assistant:id,full_name", "vehicle:id,plate_number"];
         return $this->respond($this->service->show($id, $relation));
     }
@@ -979,7 +986,7 @@ class TripController extends Controller
     public function checkIn(CheckInStudentRequest $request): Response
     {
         $validated = $request->validated();
-        
+
         return DB::transaction(function () use ($validated) {
             $result = $this->service->checkInStudent(
                 $validated['trip_id'],
@@ -987,6 +994,30 @@ class TripController extends Controller
                 $validated['flag'],
                 $validated['point_id']
             );
+            $student = \App\Models\Student::find($result['data']['student_id']);
+            $point = \App\Models\Point::find($result['data']['point_id']);
+
+            if ($student && $student->parent && $student->parent->user && $point) {
+                $flagText = $result['data']['flag'] === 1 ? 'đã xuống xe' : 'đã lên xe';
+                $emoji = $result['data']['flag'] === 1 ? '👋' : '🚌';
+
+                $this->notificationService->sendNotification(
+                    $student->parent->user,
+                    "{$emoji} Điểm danh học sinh",
+                    "{$student->full_name} {$flagText} tại {$point->address} lúc " . now()->format('H:i'),
+                    \App\Models\Notification::TYPE_ATTENDANCE,
+                    [
+                        'student_id' => $student->id,
+                        'student_name' => $student->full_name,
+                        'trip_id' => $validated['trip_id'],
+                        'point_id' => $point->id,
+                        'point_address' => $point->address,
+                        'flag' => $result['data']['flag'],
+                        'time' => now()->toIso8601String(),
+                    ]
+                );
+            }
+
             return $this->respond($result);
         }, 3);
     }
@@ -1038,4 +1069,111 @@ class TripController extends Controller
             return $this->respond($this->service->destroy($tripId));
         }, 3);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/trips/{id}/start",
+     *     summary="Start a trip",
+     *     description="Starts a trip by updating its status to active (1) and resetting all related statuses to initial values",
+     *     operationId="startTrip",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trip started successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Lộ trình đón buổi sáng"),
+     *             @OA\Property(property="status", type="integer", example=1, description="1 = Đang hoạt động"),
+     *             @OA\Property(property="total_students", type="integer", example=15),
+     *             @OA\Property(property="curr_students", type="integer", example=0, description="Reset về 0"),
+     *             @OA\Property(property="driver_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="assistant_id", type="integer", nullable=true, example=2),
+     *             @OA\Property(property="vehicle_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2026-01-18T10:30:00.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2026-01-18T10:35:00.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function startTrip($id): Response
+    {
+        $tripId = intval($id);
+        return DB::transaction(function () use ($tripId) {
+            $trip = $this->service->startTrip($tripId);
+
+            $this->notificationService->sendTripStartNotification($trip);
+
+            return $this->respond($trip);
+        }, 3);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/trips/{id}/end",
+     *     summary="End a trip",
+     *     description="Ends a trip by updating its status to finished (0)",
+     *     operationId="endTrip",
+     *     tags={"Trips"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the trip",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trip ended successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Lộ trình đón buổi sáng"),
+     *             @OA\Property(property="status", type="integer", example=0, description="0 = Đã kết thúc"),
+     *             @OA\Property(property="total_students", type="integer", example=15),
+     *             @OA\Property(property="curr_students", type="integer", example=12),
+     *             @OA\Property(property="driver_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="assistant_id", type="integer", nullable=true, example=2),
+     *             @OA\Property(property="vehicle_id", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2026-01-18T10:30:00.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2026-01-18T11:00:00.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Trip not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function endTrip($id): Response
+    {
+        $tripId = intval($id);
+        return DB::transaction(function () use ($tripId) {
+            $trip = $this->service->endTrip($tripId);
+
+            $this->notificationService->sendTripEndNotification($trip);
+
+            return $this->respond($trip);
+        }, 3);
+    }
+
 }

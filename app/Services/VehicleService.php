@@ -30,7 +30,10 @@ class VehicleService extends BaseService
             return [];
         }
 
-        $vehicleIds = \App\Models\Trip::where('assistant_id', $driver->id)
+        $vehicleIds = \App\Models\Trip::where(function ($query) use ($driver) {
+            $query->where('assistant_id', $driver->id)
+                ->orWhere('driver_id', $driver->id);
+        })
             ->whereNotNull('vehicle_id')
             ->distinct()
             ->pluck('vehicle_id')

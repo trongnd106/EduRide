@@ -24,7 +24,12 @@ class TripService extends BaseService
      */
     public function create(CreateTripRequest $request)
     {
-        $attributes = $request->validated();
+        $attributes = $request->validatedWithDefaults();
+
+        // Set default values for optional fields
+        $attributes['curr_students'] = $attributes['curr_students'] ?? 0;
+        $attributes['status'] = $attributes['status'] ?? 0;
+
         return $this->store($attributes);
     }
 
@@ -92,6 +97,7 @@ class TripService extends BaseService
                 'id' => $point->id,
                 'address' => $point->address,
                 'type' => $point->type,
+                'status' => $point->pivot->status,
                 'order' => $point->pivot->order,
                 'latitude' => $point->latitude,
                 'longitude' => $point->longitude,
@@ -114,6 +120,7 @@ class TripService extends BaseService
                 'student_id' => $student->id,
                 'full_name' => $student->full_name,
                 'grade' => $student->grade,
+                'status' => $student->pivot->status,
             ];
         })->toArray();
     }
@@ -144,6 +151,7 @@ class TripService extends BaseService
                 'full_name' => $ps->student->full_name,
                 'grade' => $ps->student->grade,
                 'type' => $ps->type, // 0 = Lên xe, 1 = Xuống xe
+                'status' => $ps->status,
             ];
         })->values()->toArray();
 
@@ -175,9 +183,12 @@ class TripService extends BaseService
             return $trip;
         }
 
+        $maxOrder = \App\Models\TripPoint::where('trip_id', $tripId)
+            ->max('order') ?? 0;
+
         $tripPoints = [];
         $now = now();
-        $order = 1;
+        $order = $maxOrder + 1;
 
         foreach ($pointIds as $pointId) {
             $existingTripPoint = \App\Models\TripPoint::where('trip_id', $tripId)
@@ -206,6 +217,44 @@ class TripService extends BaseService
             ->whereIn('point_id', $pointIds)
             ->delete();
 
+        $allStudentIds = [];
+        foreach ($pointsData as $pointData) {
+            $studentIds = $pointData['student_ids'] ?? [];
+            $allStudentIds = array_merge($allStudentIds, $studentIds);
+        }
+        $allStudentIds = array_unique($allStudentIds);
+
+        if (!empty($allStudentIds)) {
+            $existingTripStudents = TripStudent::where('trip_id', $tripId)
+                ->pluck('student_id')
+                ->toArray();
+
+            $newStudentIds = array_diff($allStudentIds, $existingTripStudents);
+
+            if (!empty($newStudentIds)) {
+                $tripStudents = [];
+                foreach ($newStudentIds as $studentId) {
+                    $tripStudents[] = [
+                        'id' => (string) \Illuminate\Support\Str::uuid(),
+                        'trip_id' => $trip->id,
+                        'student_id' => $studentId,
+                        'status' => -1,
+                        'check_in' => 0,
+                        'method' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+                TripStudent::insert($tripStudents);
+            }
+
+            TripStudent::where('trip_id', $tripId)
+                ->whereNotIn('student_id', $allStudentIds)
+                ->delete();
+        } else {
+            TripStudent::where('trip_id', $tripId)->delete();
+        }
+
         // Save point_id, student_id into point_students
         $pointStudents = [];
         foreach ($pointsData as $pointData) {
@@ -231,6 +280,12 @@ class TripService extends BaseService
             \App\Models\PointStudent::insert($pointStudents);
         }
 
+        $totalStudents = TripStudent::where('trip_id', $tripId)->count();
+
+        $trip->update([
+            'total_students' => $totalStudents,
+        ]);
+
         // Reload relationships
         $trip->load(['pointStudents.student', 'pointStudents.point', 'points']);
 
@@ -252,14 +307,17 @@ class TripService extends BaseService
 
         $trips = collect();
 
-        if ($user->hasRole(Role::ROLE_ASSISTANT)) {
+        if ($user->type === 2) { // Driver/Assistant
             $driver = $user->driver;
             if ($driver) {
-                $trips = Trip::where('assistant_id', $driver->id)
+                $trips = Trip::where(function ($query) use ($driver) {
+                    $query->where('assistant_id', $driver->id)
+                        ->orWhere('driver_id', $driver->id);
+                })
                     ->with(['driver', 'assistant', 'vehicle'])
                     ->get();
             }
-        } elseif ($user->hasRole(Role::ROLE_PARENT)) {
+        } elseif ($user->type === 1) { // Parent
             $studentParent = $user->studentParent;
             if ($studentParent) {
                 $studentIds = $studentParent->students()->pluck('id');
@@ -308,6 +366,12 @@ class TripService extends BaseService
                 'status' => $trip->status,
                 'start_time' => $trip->start_time,
                 'end_time' => $trip->end_time,
+                'is_mon' => $trip->is_mon,
+                'is_tue' => $trip->is_tue,
+                'is_wed' => $trip->is_wed,
+                'is_thu' => $trip->is_thu,
+                'is_fri' => $trip->is_fri,
+                'is_sat' => $trip->is_sat,
                 'created_at' => $trip->created_at?->toDateTimeString(),
                 'updated_at' => $trip->updated_at?->toDateTimeString(),
             ];
@@ -335,50 +399,87 @@ class TripService extends BaseService
         } else {
             $studentId = is_numeric($qrCode) ? (int) $qrCode : null;
         }
-        
+
         if (!$studentId) {
             throw new \InvalidArgumentException('QR code không hợp lệ. Không thể xác định student_id từ QR code.');
         }
-        
+
         // Verify student exists
         $student = \App\Models\Student::findOrFail($studentId);
-        
+
         // Verify point exists
         $point = \App\Models\Point::findOrFail($pointId);
-        
+
         // Verify trip_point exists
         $tripPoint = \App\Models\TripPoint::where('trip_id', $tripId)
             ->where('point_id', $pointId)
             ->firstOrFail();
-        
+
         // Verify trip_student exists
         $tripStudent = TripStudent::where('trip_id', $tripId)
             ->where('student_id', $studentId)
             ->firstOrFail();
-        
+
         // Verify point_student exists
         $pointStudent = \App\Models\PointStudent::where('trip_id', $tripId)
             ->where('point_id', $pointId)
             ->where('student_id', $studentId)
             ->firstOrFail();
-        
-        // Update trip_students: check_in = 1, status = flag
+
+        // Get current status
+        $currentStatus = $tripStudent->status;
+        $newStatus = $currentStatus;
+        $currStudentsDelta = 0; // Change in curr_students count
+
+        // Validate logic and determine status change
+        if ($flag === 0) { // Lên xe
+            if ($currentStatus === -1) {
+                $newStatus = 0;
+                $currStudentsDelta = 1; // Tăng 1 học sinh
+            } else if ($currentStatus === 0) {
+                throw new \InvalidArgumentException('Học sinh đã lên xe rồi!');
+            } else if ($currentStatus === 1) {
+                throw new \InvalidArgumentException('Học sinh đã xuống xe, không thể lên xe lại!');
+            }
+        } else if ($flag === 1) { // Xuống xe
+            if ($currentStatus === -1) {
+                throw new \InvalidArgumentException('Học sinh chưa lên xe, không thể xuống xe!');
+            } else if ($currentStatus === 0) {
+                $newStatus = 1;
+                $currStudentsDelta = -1; // Giảm 1 học sinh
+            } else if ($currentStatus === 1) {
+                throw new \InvalidArgumentException('Học sinh đã xuống xe rồi!');
+            }
+        } else {
+            throw new \InvalidArgumentException('Flag không hợp lệ. Chỉ chấp nhận 0 (lên xe) hoặc 1 (xuống xe).');
+        }
+
+        // Update trip_students: check_in = 1, status, method
         $tripStudent->update([
             'check_in' => 1,
-            'status' => $flag,
-            'method' => 1,
+            'status' => $newStatus,
+            'method' => 1, // QR code
         ]);
-        
-        // Update point_students: type = flag
+
+        // Update point_students: type = flag, status = 1
         $pointStudent->update([
             'type' => $flag,
+            'status' => 1,
         ]);
-        
+
         // Update trip_points: status = 1
         $tripPoint->update([
             'status' => 1,
         ]);
-        
+
+        // Update trip: curr_students
+        if ($currStudentsDelta !== 0) {
+            $newCurrStudents = max(0, $trip->curr_students + $currStudentsDelta);
+            $trip->update([
+                'curr_students' => $newCurrStudents,
+            ]);
+        }
+
         return [
             'success' => true,
             'message' => 'Điểm danh thành công!',
@@ -390,8 +491,70 @@ class TripService extends BaseService
                 'point_address' => $point->address,
                 'flag' => $flag,
                 'flag_description' => $flag === 1 ? 'Xuống xe' : 'Lên xe',
+                'old_status' => $currentStatus,
+                'new_status' => $newStatus,
+                'curr_students' => $trip->fresh()->curr_students, // Get updated value
             ],
         ];
     }
+
+    /**
+     * Start a trip.
+     * Updates trip status to 1 (active), resets all related statuses.
+     *
+     * @param int $tripId
+     * @return Trip
+     */
+    public function startTrip(int $tripId): Trip
+    {
+        $trip = $this->show($tripId);
+
+        $trip->update([
+            'status' => 1,
+        ]);
+
+        \App\Models\TripPoint::where('trip_id', $tripId)
+            ->update(['status' => 0]);
+
+        TripStudent::where('trip_id', $tripId)
+            ->update([
+                'status' => -1,
+                'check_in' => 0,
+                'method' => null,
+            ]);
+
+        \App\Models\PointStudent::where('trip_id', $tripId)
+            ->update(['status' => 0]);
+
+        $trip->update([
+            'curr_students' => 0,
+        ]);
+
+        $trip->load(['driver.user', 'assistant.user', 'vehicle', 'tripStudents', 'tripPoints', 'pointStudents', 'students.parent.user']);
+
+        return $trip;
+    }
+
+    /**
+     * End a trip.
+     * Updates trip status to 0 (not started/finished).
+     *
+     * @param int $tripId
+     * @return Trip
+     */
+    public function endTrip(int $tripId): Trip
+    {
+        $trip = $this->show($tripId);
+
+        $trip->update([
+            'status' => 0,
+            'curr_students' => 0,
+        ]);
+
+        $trip->load(['driver.user', 'assistant.user', 'vehicle', 'tripStudents', 'tripPoints', 'pointStudents', 'students.parent.user']);
+
+        return $trip;
+    }
+
 }
 

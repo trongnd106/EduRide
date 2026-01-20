@@ -93,19 +93,52 @@ class AuthService
         if (!$result['token']) {
             throw new AuthorizationException(__('api.exception.invalid_credentials'));
         }
-        
+
         // Get user from email after token is successfully generated
         // Token generation already validates credentials, so we can safely get user
         $user = $modelNamespace::where('email', $email)
             ->where('status', AppConst::STATUS_ACTIVE)
             ->with('roles') // Load roles relationship
             ->first();
-        
+
         if ($user) {
             $result['user'] = $user;
+            $result['roleId'] = $this->getRoleId($user);
+
         }
 
         return $result;
+    }
+
+    /**
+     * Get role ID based on user type and relationships
+     * 
+     * @param User $user
+     * @return int|null
+     */
+    private function getRoleId($user): ?int
+    {
+        // Check if user has driver relationship
+        if ($user->driver) {
+            return $user->driver->id;
+        }
+
+        // Check if user has studentParent relationship
+        if ($user->studentParent) {
+            return $user->studentParent->id;
+        }
+
+        // Fallback: check user type (1 = Parent, 2 = Driver)
+        // This is for cases where relationships might not be loaded
+        if ($user->type === 1 && $user->studentParent) {
+            return $user->studentParent->id;
+        }
+
+        if ($user->type === 2 && $user->driver) {
+            return $user->driver->id;
+        }
+
+        return null;
     }
 
     public function logout($user)
@@ -146,7 +179,7 @@ class AuthService
 
         $request = Request::create('/oauth/token', 'POST', [
             'grant_type' => 'password',
-            'client_id' => (string)$oClient->id,
+            'client_id' => (string) $oClient->id,
             'client_secret' => $oClient->secret,
             'username' => $email,
             'password' => $password,
@@ -154,7 +187,7 @@ class AuthService
         ]);
         $response = app()->handle($request);
         if ($response->getStatusCode() === HttpResponse::HTTP_OK) {
-            return json_decode((string)$response->getContent(), true);
+            return json_decode((string) $response->getContent(), true);
         }
         return null;
     }
@@ -168,18 +201,19 @@ class AuthService
     public function refreshToken(string $modelNamespace, string $refreshToken)
     {
         $oClient = $this->_getClient($modelNamespace);
-        if (!$oClient) return null;
+        if (!$oClient)
+            return null;
 
         $request = Request::create('/oauth/token', 'POST', [
             'grant_type' => 'refresh_token',
-            'client_id' => (string)$oClient->id,
+            'client_id' => (string) $oClient->id,
             'client_secret' => $oClient->secret,
             'refresh_token' => $refreshToken,
             'scope' => '*',
         ]);
         $response = app()->handle($request);
         if ($response->getStatusCode() === HttpResponse::HTTP_OK) {
-            return json_decode((string)$response->getContent(), true);
+            return json_decode((string) $response->getContent(), true);
         }
         return null;
     }
@@ -207,7 +241,8 @@ class AuthService
         $currentToken = auth()->user()->token();
         if (count($tokens)) {
             foreach ($tokens as $token) {
-                if ($token->id === $currentToken->id && !$include) continue;
+                if ($token->id === $currentToken->id && !$include)
+                    continue;
                 $this->revokeToken($token);
             }
         }
@@ -293,10 +328,10 @@ class AuthService
                 "email" => $user->email,
                 "user_phone" => $user->user_phone,
                 "division" => $user->division ? AppConst::DIVISIONS[$user->division] : '',
-                "position" => $user->position ? AppConst::POSITIONS[$user->position]: '',
-                "industry" => $user->industry ? AppConst::INDUSTRIES[$user->industry]: '',
-                "employee_size" => $user->employee_size ? AppConst::EMPLOYEE_SIZES[$user->employee_size]: '',
-                "how_found_us" => $user->how_found_us ? AppConst::HOW_FOUND_US_LIST[$user->how_found_us]: '',
+                "position" => $user->position ? AppConst::POSITIONS[$user->position] : '',
+                "industry" => $user->industry ? AppConst::INDUSTRIES[$user->industry] : '',
+                "employee_size" => $user->employee_size ? AppConst::EMPLOYEE_SIZES[$user->employee_size] : '',
+                "how_found_us" => $user->how_found_us ? AppConst::HOW_FOUND_US_LIST[$user->how_found_us] : '',
                 "url_site" => $domain
             ];
             Mail::to($passwordReset->email)->send(new EmailUserRegister($dataEmail));
