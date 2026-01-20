@@ -470,5 +470,63 @@ class TripService extends BaseService
             ],
         ];
     }
+
+    /**
+     * Start a trip.
+     * Updates trip status to 1 (active), resets all related statuses.
+     *
+     * @param int $tripId
+     * @return Trip
+     */
+    public function startTrip(int $tripId): Trip
+    {
+        $trip = $this->show($tripId);
+
+        $trip->update([
+            'status' => 1,
+        ]);
+
+        \App\Models\TripPoint::where('trip_id', $tripId)
+            ->update(['status' => 0]);
+
+        TripStudent::where('trip_id', $tripId)
+            ->update([
+                'status' => -1,
+                'check_in' => 0,
+                'method' => null,
+            ]);
+
+        \App\Models\PointStudent::where('trip_id', $tripId)
+            ->update(['status' => 0]);
+
+        $trip->update([
+            'curr_students' => 0,
+        ]);
+
+        $trip->load(['driver.user', 'assistant.user', 'vehicle', 'tripStudents', 'tripPoints', 'pointStudents', 'students.parent.user']);
+
+        return $trip;
+    }
+
+    /**
+     * End a trip.
+     * Updates trip status to 0 (not started/finished).
+     *
+     * @param int $tripId
+     * @return Trip
+     */
+    public function endTrip(int $tripId): Trip
+    {
+        $trip = $this->show($tripId);
+
+        $trip->update([
+            'status' => 0,
+        ]);
+
+        $trip->load(['driver.user', 'assistant.user', 'vehicle', 'tripStudents', 'tripPoints', 'pointStudents', 'students.parent.user']);
+
+        return $trip;
+    }
+
 }
 

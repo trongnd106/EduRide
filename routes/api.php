@@ -46,8 +46,10 @@ Route::apiResource('points', PointController::class);
 
 // Custom routes for trips
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
-    Route::get('user-trips', [TripController::class, 'getUserTrips'])->name('user.my-trips');
+    Route::get('user-trips', [TripController::class, 'getUserTrips'])->middleware('auth:api')->name('user.my-trips');
     Route::post('check-in', [TripController::class, 'checkIn'])->name('check-in');
+    Route::post('{id}/start', [TripController::class, 'startTrip'])->name('start');
+    Route::post('{id}/end', [TripController::class, 'endTrip'])->name('end');
     Route::post('{id}/assign-students', [TripController::class, 'assignStudents'])->name('assign-students');
     Route::post('{id}/assign-point-students', [TripController::class, 'assignPointStudents'])->name('assign-point-students');
     Route::get('{id}/points', [TripController::class, 'getPoints'])->name('points');
