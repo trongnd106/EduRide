@@ -35,7 +35,7 @@ Route::apiResource('schools', SchoolController::class);
 Route::get('drivers/all', [DriverController::class, 'all'])->name('drivers.all');
 Route::apiResource('drivers', DriverController::class);
 Route::get('vehicles/all', [VehicleController::class, 'all'])->name('vehicles.all');
-Route::get('vehicles/user-trips', [VehicleController::class, 'getAssistantVehicles'])->name('vehicles.my-trips');
+Route::get('vehicles/user-trips', [VehicleController::class, 'getAssistantVehicles'])->middleware('auth:api')->name('vehicles.my-trips');
 Route::apiResource('vehicles', VehicleController::class);
 Route::get('student-parents/all', [StudentParentController::class, 'all'])->name('student-parents.all');
 Route::apiResource('student-parents', StudentParentController::class);
