@@ -217,23 +217,31 @@ class TripService extends BaseService
             ->whereIn('point_id', $pointIds)
             ->delete();
 
-        $allStudentIds = [];
+        $newStudentIds = [];
         foreach ($pointsData as $pointData) {
             $studentIds = $pointData['student_ids'] ?? [];
-            $allStudentIds = array_merge($allStudentIds, $studentIds);
+            $newStudentIds = array_merge($newStudentIds, $studentIds);
         }
-        $allStudentIds = array_unique($allStudentIds);
+        $newStudentIds = array_unique($newStudentIds);
+
+        $otherPointsStudentIds = \App\Models\PointStudent::where('trip_id', $tripId)
+            ->whereNotIn('point_id', $pointIds)
+            ->pluck('student_id')
+            ->unique()
+            ->toArray();
+
+        $allStudentIds = array_unique(array_merge($newStudentIds, $otherPointsStudentIds));
 
         if (!empty($allStudentIds)) {
             $existingTripStudents = TripStudent::where('trip_id', $tripId)
                 ->pluck('student_id')
                 ->toArray();
 
-            $newStudentIds = array_diff($allStudentIds, $existingTripStudents);
+            $studentsToAdd = array_diff($allStudentIds, $existingTripStudents);
 
-            if (!empty($newStudentIds)) {
+            if (!empty($studentsToAdd)) {
                 $tripStudents = [];
-                foreach ($newStudentIds as $studentId) {
+                foreach ($studentsToAdd as $studentId) {
                     $tripStudents[] = [
                         'id' => (string) \Illuminate\Support\Str::uuid(),
                         'trip_id' => $trip->id,
@@ -252,7 +260,16 @@ class TripService extends BaseService
                 ->whereNotIn('student_id', $allStudentIds)
                 ->delete();
         } else {
-            TripStudent::where('trip_id', $tripId)->delete();
+            $studentsInUpdatedPoints = \App\Models\PointStudent::where('trip_id', $tripId)
+                ->whereIn('point_id', $pointIds)
+                ->pluck('student_id')
+                ->unique()
+                ->toArray();
+
+            TripStudent::where('trip_id', $tripId)
+                ->whereIn('student_id', $studentsInUpdatedPoints)
+                ->whereNotIn('student_id', $otherPointsStudentIds) // Giữ students ở points khác
+                ->delete();
         }
 
         // Save point_id, student_id into point_students
@@ -268,7 +285,7 @@ class TripService extends BaseService
                     'point_id' => $pointId,
                     'student_id' => $studentId,
                     'type' => 0,  // len xe
-                    'status' => null, // Không dùng nữa, để null
+                    'status' => null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -291,6 +308,7 @@ class TripService extends BaseService
 
         return $trip;
     }
+
 
     /**
      * Get trips for the authenticated user based on their role.
