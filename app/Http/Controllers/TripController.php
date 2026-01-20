@@ -7,15 +7,21 @@ use App\Http\Requests\AssignTripPointStudentsRequest;
 use App\Http\Requests\CheckInStudentRequest;
 use App\Http\Requests\CreateTripRequest;
 use App\Services\TripService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class TripController extends Controller
 {
-    public function __construct(TripService $tripService)
-    {
+    protected $notificationService;
+
+    public function __construct(
+        TripService $tripService,
+        NotificationService $notificationService
+    ) {
         parent::__construct($tripService);
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -736,7 +742,7 @@ class TripController extends Controller
      */
     public function show($id): Response
     {
-$id = intval($id);
+        $id = intval($id);
         $relation = ["driver:id,full_name", "assistant:id,full_name", "vehicle:id,plate_number"];
         return $this->respond($this->service->show($id, $relation));
     }
@@ -980,7 +986,7 @@ $id = intval($id);
     public function checkIn(CheckInStudentRequest $request): Response
     {
         $validated = $request->validated();
-        
+
         return DB::transaction(function () use ($validated) {
             $result = $this->service->checkInStudent(
                 $validated['trip_id'],
@@ -988,6 +994,30 @@ $id = intval($id);
                 $validated['flag'],
                 $validated['point_id']
             );
+            $student = \App\Models\Student::find($result['data']['student_id']);
+            $point = \App\Models\Point::find($result['data']['point_id']);
+
+            if ($student && $student->parent && $student->parent->user && $point) {
+                $flagText = $result['data']['flag'] === 1 ? 'đã xuống xe' : 'đã lên xe';
+                $emoji = $result['data']['flag'] === 1 ? '👋' : '🚌';
+
+                $this->notificationService->sendNotification(
+                    $student->parent->user,
+                    "{$emoji} Điểm danh học sinh",
+                    "{$student->full_name} {$flagText} tại {$point->address} lúc " . now()->format('H:i'),
+                    \App\Models\Notification::TYPE_ATTENDANCE,
+                    [
+                        'student_id' => $student->id,
+                        'student_name' => $student->full_name,
+                        'trip_id' => $validated['trip_id'],
+                        'point_id' => $point->id,
+                        'point_address' => $point->address,
+                        'flag' => $result['data']['flag'],
+                        'time' => now()->toIso8601String(),
+                    ]
+                );
+            }
+
             return $this->respond($result);
         }, 3);
     }

@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,10 +40,6 @@ Route::apiResource('vehicles', VehicleController::class);
 Route::get('student-parents/all', [StudentParentController::class, 'all'])->name('student-parents.all');
 Route::apiResource('student-parents', StudentParentController::class);
 Route::apiResource('users', UserController::class);
-Route::apiResource('trips', TripController::class);
-Route::get('points/all', [PointController::class, 'all'])->name('points.all');
-Route::apiResource('points', PointController::class);
-
 // Custom routes for trips
 Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
     Route::get('user-trips', [TripController::class, 'getUserTrips'])->middleware('auth:api')->name('user.my-trips');
@@ -55,4 +51,24 @@ Route::group(['prefix' => 'trips', 'as' => 'trips.'], function () {
     Route::get('{id}/points', [TripController::class, 'getPoints'])->name('points');
     Route::get('{id}/students', [TripController::class, 'getStudents'])->name('students');
     Route::get('{trip_id}/points/{point_id}/students', [TripController::class, 'getPointStudents'])->name('point-students');
+});
+
+Route::apiResource('trips', TripController::class);
+Route::get('points/all', [PointController::class, 'all'])->name('points.all');
+Route::apiResource('points', PointController::class);
+
+Route::prefix('notifications')->middleware('auth:api')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::get('/{id}', [NotificationController::class, 'show']);
+    Route::put('/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
+    Route::put('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    Route::delete('/read/all', [NotificationController::class, 'deleteAllRead']);
+    Route::post('/fcm-token', [NotificationController::class, 'updateFcmToken']);
+
+    // Test route (only for development)
+    if (config('app.env') !== 'production') {
+        Route::post('/test-send', [NotificationController::class, 'testSendNotification']);
+    }
 });
