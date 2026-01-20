@@ -29,6 +29,12 @@ class Trip extends Model
         'status',
         'start_time',
         'end_time',
+        'is_mon',
+        'is_tue',
+        'is_wed',
+        'is_thu',
+        'is_fri',
+        'is_sat',
     ];
 
     /**
@@ -48,6 +54,12 @@ class Trip extends Model
         'end_time' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'is_mon' => 'boolean',
+        'is_tue' => 'boolean',
+        'is_wed' => 'boolean',
+        'is_thu' => 'boolean',
+        'is_fri' => 'boolean',
+        'is_sat' => 'boolean',
     ];
 
     /**

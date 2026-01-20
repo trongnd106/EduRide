@@ -24,7 +24,12 @@ class TripService extends BaseService
      */
     public function create(CreateTripRequest $request)
     {
-        $attributes = $request->validated();
+        $attributes = $request->validatedWithDefaults();
+
+        // Set default values for optional fields
+        $attributes['curr_students'] = $attributes['curr_students'] ?? 0;
+        $attributes['status'] = $attributes['status'] ?? 0;
+
         return $this->store($attributes);
     }
 
