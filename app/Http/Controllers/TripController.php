@@ -736,6 +736,7 @@ class TripController extends Controller
      */
     public function show($id): Response
     {
+$id = intval($id);
         $relation = ["driver:id,full_name", "assistant:id,full_name", "vehicle:id,plate_number"];
         return $this->respond($this->service->show($id, $relation));
     }

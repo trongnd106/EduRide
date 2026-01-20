@@ -104,7 +104,7 @@ class Trip extends Model
     public function points()
     {
         return $this->belongsToMany(Point::class, 'trip_points', 'trip_id', 'point_id')
-            ->withPivot('order')
+            ->withPivot('order', 'status')
             ->withTimestamps()
             ->orderBy('trip_points.order');
     }
