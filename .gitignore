@@ -4,6 +4,7 @@
 /storage/*.key
 /storage/logs
 /storage/api-docs
+/storage/app/firebase
 /vendor
 .env
 .env.testing

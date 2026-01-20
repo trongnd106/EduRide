@@ -20,6 +20,7 @@ services:
     volumes:
       - app_storage:/var/www/storage
       - ./.env:/var/www/.env:ro
+      - ./firebase-credentials.json:/var/www/storage/app/firebase/firebase-credentials.json:ro
     ports:
       - "${APP_PORT:-80}:80"
     depends_on:
