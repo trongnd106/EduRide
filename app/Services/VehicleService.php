@@ -21,7 +21,7 @@ class VehicleService extends BaseService
     {
         $user = auth()->user();
 
-        if (!$user || !$user->hasRole(Role::ROLE_ASSISTANT)) {
+        if (!$user || $user->type !== 2) {
             return [];
         }
 
