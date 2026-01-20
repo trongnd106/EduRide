@@ -280,6 +280,12 @@ class TripService extends BaseService
             \App\Models\PointStudent::insert($pointStudents);
         }
 
+        $totalStudents = TripStudent::where('trip_id', $tripId)->count();
+
+        $trip->update([
+            'total_students' => $totalStudents,
+        ]);
+
         // Reload relationships
         $trip->load(['pointStudents.student', 'pointStudents.point', 'points']);
 
@@ -393,50 +399,54 @@ class TripService extends BaseService
         } else {
             $studentId = is_numeric($qrCode) ? (int) $qrCode : null;
         }
-        
+
         if (!$studentId) {
             throw new \InvalidArgumentException('QR code không hợp lệ. Không thể xác định student_id từ QR code.');
         }
-        
+
         // Verify student exists
         $student = \App\Models\Student::findOrFail($studentId);
-        
+
         // Verify point exists
         $point = \App\Models\Point::findOrFail($pointId);
-        
+
         // Verify trip_point exists
         $tripPoint = \App\Models\TripPoint::where('trip_id', $tripId)
             ->where('point_id', $pointId)
             ->firstOrFail();
-        
+
         // Verify trip_student exists
         $tripStudent = TripStudent::where('trip_id', $tripId)
             ->where('student_id', $studentId)
             ->firstOrFail();
-        
+
         // Verify point_student exists
         $pointStudent = \App\Models\PointStudent::where('trip_id', $tripId)
             ->where('point_id', $pointId)
             ->where('student_id', $studentId)
             ->firstOrFail();
-        
-        // Update trip_students: check_in = 1
-        $currentStatus = $tripStudent->status;
 
-        // Validate logic
-        if ($flag === 0) {
+        // Get current status
+        $currentStatus = $tripStudent->status;
+        $newStatus = $currentStatus;
+        $currStudentsDelta = 0; // Change in curr_students count
+
+        // Validate logic and determine status change
+        if ($flag === 0) { // Lên xe
             if ($currentStatus === -1) {
                 $newStatus = 0;
+                $currStudentsDelta = 1; // Tăng 1 học sinh
             } else if ($currentStatus === 0) {
                 throw new \InvalidArgumentException('Học sinh đã lên xe rồi!');
             } else if ($currentStatus === 1) {
                 throw new \InvalidArgumentException('Học sinh đã xuống xe, không thể lên xe lại!');
             }
-        } else if ($flag === 1) {
+        } else if ($flag === 1) { // Xuống xe
             if ($currentStatus === -1) {
                 throw new \InvalidArgumentException('Học sinh chưa lên xe, không thể xuống xe!');
             } else if ($currentStatus === 0) {
                 $newStatus = 1;
+                $currStudentsDelta = -1; // Giảm 1 học sinh
             } else if ($currentStatus === 1) {
                 throw new \InvalidArgumentException('Học sinh đã xuống xe rồi!');
             }
@@ -444,23 +454,32 @@ class TripService extends BaseService
             throw new \InvalidArgumentException('Flag không hợp lệ. Chỉ chấp nhận 0 (lên xe) hoặc 1 (xuống xe).');
         }
 
+        // Update trip_students: check_in = 1, status, method
         $tripStudent->update([
             'check_in' => 1,
             'status' => $newStatus,
             'method' => 1, // QR code
         ]);
-        
-        // Update point_students: type = flag
+
+        // Update point_students: type = flag, status = 1
         $pointStudent->update([
             'type' => $flag,
             'status' => 1,
         ]);
-        
+
         // Update trip_points: status = 1
         $tripPoint->update([
             'status' => 1,
         ]);
-        
+
+        // Update trip: curr_students
+        if ($currStudentsDelta !== 0) {
+            $newCurrStudents = max(0, $trip->curr_students + $currStudentsDelta);
+            $trip->update([
+                'curr_students' => $newCurrStudents,
+            ]);
+        }
+
         return [
             'success' => true,
             'message' => 'Điểm danh thành công!',
@@ -472,6 +491,9 @@ class TripService extends BaseService
                 'point_address' => $point->address,
                 'flag' => $flag,
                 'flag_description' => $flag === 1 ? 'Xuống xe' : 'Lên xe',
+                'old_status' => $currentStatus,
+                'new_status' => $newStatus,
+                'curr_students' => $trip->fresh()->curr_students, // Get updated value
             ],
         ];
     }
@@ -526,6 +548,7 @@ class TripService extends BaseService
 
         $trip->update([
             'status' => 0,
+            'curr_students' => 0,
         ]);
 
         $trip->load(['driver.user', 'assistant.user', 'vehicle', 'tripStudents', 'tripPoints', 'pointStudents', 'students.parent.user']);
