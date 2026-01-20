@@ -17,3 +17,14 @@ ssh -i ~/.ssh/id_rsa ubuntu@34.61.124.56
 ```
 php artisan passport:client --password --provider users --name users
 ```
+
+### 5. Deploy Firebase Credentials lên Server:
+```bash
+scp storage/app/firebase/firebase-credentials.json ubuntu@34.61.124.56:~/Backend/firebase-credentials.json
+
+ssh -i ~/.ssh/id_rsa ubuntu@34.61.124.56
+cd Backend
+./deploy.sh
+```
+
+**Note:** File `firebase-credentials.json`  tồn tại ở thư mục gốc của project trên server (ngang hàng với docker-compose.prod.yml)
