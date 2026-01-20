@@ -23,7 +23,7 @@ php artisan passport:client --password --provider users --name users
 scp storage/app/firebase/firebase-credentials.json ubuntu@34.61.124.56:~/Backend/firebase-credentials.json
 
 ssh -i ~/.ssh/id_rsa ubuntu@34.61.124.56
-cd Backend
+cd hust-backend
 ./deploy.sh
 ```
 
